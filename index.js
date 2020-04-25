@@ -4618,10 +4618,12 @@ async function testMail(n, mail) {
   let transporter = nodeMailer.createTransport({
     service: 'gmail',
     host: 'smtp.gmail.com',
-    port: 465,
-    socketTimeout: 5000,
+    port: 587,
+    secure: false,
+    // secure: true,
+    requireTLS: true,
+    socketTimeout: 10000,
     logger: true,
-    secure: true,
     auth: {
         // should be replaced with real sender's account
         user: 'jobsnearby1000@gmail.com',
