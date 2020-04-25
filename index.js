@@ -4616,8 +4616,11 @@ async function testMail(n, mail) {
   let txt = baseUrl + '/verify.json?n=' + n
   console.log('sending mail func: ' + txt)
   let transporter = nodeMailer.createTransport({
+    service: 'gmail',
     host: 'smtp.gmail.com',
     port: 465,
+    socketTimeout: 5000,
+    logger: true,
     secure: true,
     auth: {
         // should be replaced with real sender's account
