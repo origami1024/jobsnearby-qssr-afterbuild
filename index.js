@@ -2674,7 +2674,8 @@ module.exports = __webpack_require__(25);
 const
   express = __webpack_require__(26),
   compression = __webpack_require__(27)
-
+  //https = require('https') //https1
+  
 const
   ssr = __webpack_require__(28),
   extension = __webpack_require__(33),
@@ -2760,6 +2761,9 @@ app.get('*', (req, res) => {
 app.listen(port, () => {
   console.log(`Server listening at port ${port}`)
 })
+// app.listen(port, () => {
+//   console.log(`Server listening at port ${port}`)
+// })
 
 
 /***/ }),
@@ -3007,7 +3011,7 @@ module.exports.extendApp = function ({ app, ssr }) {
   //1
   app.get('/', async function (req, res, next) {
     //auth first
-    console.log('cp1debug')
+    // console.log('cp1debug')
     if (db.authPreValidation(req.cookies.session, req.cookies.mail)) {
       req.userData = await db.getUserAuthByCookies(req.cookies.session, req.cookies.mail).catch(error => {
         console.log('getUserAuthByCookies. xxx', error)
@@ -3166,8 +3170,9 @@ module.exports.extendApp = function ({ app, ssr }) {
 const Pool = __webpack_require__(13).Pool
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL || `postgres://postgres:123456@localhost:5433/jobsnearby`
+  // connectionString: `postgres://postgres@localhost:5432/jobsnearby`
 })
-
+console.log('debug1', process.env.DATABASE_URL)
 const titleRegex = /^[\wа-яА-ЯÇçÄä£ſÑñňÖö$¢Üü¥ÿýŽžŞş\s\-\+\$\%\(\)\№\:\#\/]*$/
 
 const bcrypt = __webpack_require__(14)
@@ -4619,7 +4624,7 @@ async function testMail(n, mail) {
   let transporter = nodeMailer.createTransport({
     service: 'gmail',
     host: 'smtp.gmail.com',
-    port: 587,
+    port: 465,
     secure: false,
     // secure: true,
     requireTLS: true,
@@ -5179,6 +5184,7 @@ module.exports = require("jsonwebtoken");
 const Pool = __webpack_require__(13).Pool
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL || `postgres://postgres:123456@localhost:5433/jobsnearby`
+  // connectionString: `postgres://postgres@localhost:5432/jobsnearby`
 })
 
 
@@ -5221,9 +5227,7 @@ async function cpLoginEndpoint(req, res) {
       res.send('<html><script>window.location.href = "/cplogin.json?e=err1"</script></html>')
       return false
     }
-    console.log('23')
     let authed = bcrypt.compareSync(pw, adminData)
-    console.log('cp54: ', authed)
 
     if (authed) {
       let jwtoken = SupremeValidator.generateJSONWebToken(mail)
