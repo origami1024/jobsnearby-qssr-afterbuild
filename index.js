@@ -3418,8 +3418,8 @@ async function insertForgottenEntry(mail, url) {
 async function forgottenMail(url, mail) {
   let transporter = nodeMailer.createTransport({
     host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
+    port: 587,
+    secure: false,
     auth: {
         // should be replaced with real sender's account
         user: 'jobsnearby1000@gmail.com',
@@ -3556,8 +3556,8 @@ async function forgottenx2Mail(newpw, mail) {
   console.log('sending forgotten2: ' + newpw + ' ' + mail)
   let transporter = nodeMailer.createTransport({
     host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
+    port: 587,
+    secure: false,
     auth: {
         user: 'jobsnearby1000@gmail.com',
         pass: 'g789451bb'
@@ -4620,14 +4620,14 @@ async function testMail(n, mail) {
   let baseUrl =  true ? 'https://jobsnearby.herokuapp.com' : undefined
   
   let txt = baseUrl + '/verify.json?n=' + n
-  console.log('sending mail func: ' + txt)
+  console.log('sending mail func1: ' + txt)
   let transporter = nodeMailer.createTransport({
-    service: 'gmail',
+    // service: 'gmail',
     host: 'smtp.gmail.com',
-    port: 465,
+    port: 587,
+    //secure: false,
     secure: false,
-    // secure: true,
-    requireTLS: true,
+    // requireTLS: true,
     socketTimeout: 10000,
     logger: true,
     auth: {
