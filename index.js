@@ -3173,6 +3173,9 @@ const pool = new Pool({
   // connectionString: `postgres://postgres@localhost:5432/jobsnearby`
 })
 console.log('debug1', process.env.DATABASE_URL)
+console.log('debug2', process.env.SITE_URL)
+console.log('debug3', process.env.GMAIL_FOR_VERIFICATIONS)
+console.log('debug4', process.env.GMAIL_PW)
 const titleRegex = /^[\wа-яА-ЯÇçÄä£ſÑñňÖö$¢Üü¥ÿýŽžŞş\s\-\+\$\%\(\)\№\:\#\/]*$/
 
 const bcrypt = __webpack_require__(14)
@@ -3374,7 +3377,8 @@ async function resender(req, res) {
           //res.send('step2')
           return undefined
         })
-        let baseUrl =  true ? 'https://jobsnearby.herokuapp.com' : undefined
+        //let baseUrl = process.env.NODE_ENV ? 'https://jobsnearby.herokuapp.com' : 'http://127.0.0.1:8080'
+        let baseUrl = process.env.SITE_URL || 'http://127.0.0.1:8080'
         //res.send('Повторное письмо с ссылкой для активации учетной записи отправлено. <a href="' + baseUrl + '/registration?login=1">Войти</a> на сайт.')
         res.send('<html><body><script>window.location.replace("' + baseUrl + '/registration?login=1&resender=1")</script></body></html>')
       } else {
@@ -3422,12 +3426,12 @@ async function forgottenMail(url, mail) {
     secure: false,
     auth: {
         // should be replaced with real sender's account
-        user: 'jobsnearby1000@gmail.com',
-        pass: 'g789451bb'
+        user: process.env.GMAIL_FOR_VERIFICATIONS || 'jobsnearby1000@gmail.com',
+        pass: process.env.GMAIL_PW || 'g789451bb'
     }
   })
   console.log('sending letter')
-  let baseUrl =  true ? 'https://jobsnearby.herokuapp.com' : undefined
+  let baseUrl = process.env.SITE_URL || 'http://127.0.0.1:7777'
   let url1 = baseUrl + '/forgottenx2.json?n=' + url
   let mailOptions = {
     // should be replaced with real recipient's account
@@ -3559,8 +3563,8 @@ async function forgottenx2Mail(newpw, mail) {
     port: 587,
     secure: false,
     auth: {
-        user: 'jobsnearby1000@gmail.com',
-        pass: 'g789451bb'
+      user: process.env.GMAIL_FOR_VERIFICATIONS || 'jobsnearby1000@gmail.com',
+      pass: process.env.GMAIL_PW || 'g789451bb'
     }
   })
   let mailOptions = {
@@ -3615,7 +3619,8 @@ async function forgottenx2(req, res) {
       })
       //send letter-2 to the mail in the consumed entry
       forgottenx2Mail(newpw, forg.mail)
-      let baseUrl =  true ? 'https://jobsnearby.herokuapp.com' : undefined
+      //let baseUrl = process.env.NODE_ENV ? 'https://jobsnearby.herokuapp.com' : 'http://127.0.0.1:8080'
+      let baseUrl = process.env.SITE_URL || 'http://127.0.0.1:8080'
       //res.send('Пароль сброшен. Новый пароль отправлен на вашу почту. <a href="' + baseUrl + '/registration?login=1">Войти</a>')
       res.send('<html><body><script>window.location.replace("' + baseUrl + '/registration?login=1&reset=1")</script></body></html>')
     } else res.send('Ссылка сброса пароля просрочена (2 часа макс), попробуйте еще раз')
@@ -4297,7 +4302,7 @@ async function verify(req, res) {
   
   if (veri === 1) {
     console.log('copcpo sending reload!', veri)
-    let baseUrl =  true ? 'https://jobsnearby.herokuapp.com' : undefined
+    let baseUrl = process.env.SITE_URL || 'http://127.0.0.1:8080'
     //res.send('Email пользователя верифицирован. Теперь вы можете <a href="' + baseUrl + '/registration?login=1">Войти</a>')
     res.send('<html><body><script>window.location.replace("' + baseUrl + '/registration?login=1&verified=1")</script></body></html>')
   } else res.send('Ошибка в адресе верификации')
@@ -4617,7 +4622,7 @@ async function getCompanyById(req, res) {
 }
 
 async function testMail(n, mail) {
-  let baseUrl =  true ? 'https://jobsnearby.herokuapp.com' : undefined
+  let baseUrl = process.env.SITE_URL || 'http://127.0.0.1:7777'
   
   let txt = baseUrl + '/verify.json?n=' + n
   console.log('sending mail func1: ' + txt)
@@ -4632,8 +4637,8 @@ async function testMail(n, mail) {
     logger: true,
     auth: {
         // should be replaced with real sender's account
-        user: 'jobsnearby1000@gmail.com',
-        pass: 'g789451bb'
+        user: process.env.GMAIL_FOR_VERIFICATIONS || 'jobsnearby1000@gmail.com',
+        pass: process.env.GMAIL_PW || 'g789451bb'
     }
   })
   let mailOptions = {
