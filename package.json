@@ -1,7 +1,7 @@
 {
   "name": "jobsnearby-ssr-q",
-  "version": "0.0.1",
-  "description": "A Quasar Framework app",
+  "version": "1.0.0",
+  "description": "Работа в Туркменистане",
   "author": "origami <origami1024@gmail.com>",
   "private": true,
   "scripts": {
