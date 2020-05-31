@@ -2805,7 +2805,7 @@ const settings = {
     "maxAge": 900000
   },
   "debug": false,
-  "preloadChunks": false
+  "preloadChunks": true
 }
 
 if (process.env.DEBUG) {
