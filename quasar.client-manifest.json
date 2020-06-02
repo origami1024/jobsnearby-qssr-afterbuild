@@ -3,17 +3,17 @@
   "all": [
     "fonts/flUhRq6tzZclQEJ-Vdg-IuiaDsNa.f2a09334.woff",
     "fonts/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.12a47ed5.woff2",
-    "js/10.5ccef8df.js",
+    "js/10.cda64ed0.js",
     "js/11.c04c742b.js",
     "js/3.b11d46d0.js",
     "js/4.49e681fc.js",
-    "js/5.5830aaf1.js",
+    "js/5.333494d2.js",
     "js/6.76c90e34.js",
     "js/7.c695cf7f.js",
     "js/8.cd79171c.js",
     "js/9.d032225a.js",
-    "js/app.0e20f027.js",
-    "js/runtime.ed748152.js",
+    "js/app.c966bd64.js",
+    "js/runtime.3ddbca80.js",
     "js/vendor.9d34b434.js",
     "statics/app-logo-128x128.png",
     "statics/bg1-mobile.png",
@@ -27,20 +27,21 @@
     "statics/icons/favicon.ico",
     "statics/login.png",
     "statics/logoph.png",
+    "statics/robots.txt",
     "statics/search-mobile.png",
     "statics/vac.xlsx"
   ],
   "initial": [
-    "js/runtime.ed748152.js",
+    "js/runtime.3ddbca80.js",
     "js/vendor.9d34b434.js",
-    "js/app.0e20f027.js"
+    "js/app.c966bd64.js"
   ],
   "async": [
-    "js/10.5ccef8df.js",
+    "js/10.cda64ed0.js",
     "js/11.c04c742b.js",
     "js/3.b11d46d0.js",
     "js/4.49e681fc.js",
-    "js/5.5830aaf1.js",
+    "js/5.333494d2.js",
     "js/6.76c90e34.js",
     "js/7.c695cf7f.js",
     "js/8.cd79171c.js",
@@ -108,6 +109,9 @@
       0,
       1
     ],
+    "badff790": [
+      11
+    ],
     "fb2249c6": [
       13,
       0,
@@ -145,9 +149,6 @@
       13,
       0,
       1
-    ],
-    "2d62da16": [
-      2
     ],
     "b9525fd6": [
       13,
@@ -200,9 +201,6 @@
       0,
       1
     ],
-    "9cd0b3f8": [
-      6
-    ],
     "7e1b0f20": [
       13,
       0,
@@ -212,6 +210,9 @@
       13,
       0,
       1
+    ],
+    "55976ea3": [
+      2
     ],
     "b304d82a": [
       13,
@@ -297,6 +298,9 @@
       13,
       0,
       1
+    ],
+    "5792e89e": [
+      6
     ],
     "29b99c19": [
       13,
@@ -519,6 +523,9 @@
       0,
       1
     ],
+    "338edea9": [
+      6
+    ],
     "1882bee6": [
       13,
       0,
@@ -551,9 +558,6 @@
       13,
       0,
       1
-    ],
-    "7baf1dae": [
-      2
     ],
     "56d43f78": [
       13,
@@ -636,6 +640,9 @@
       13,
       0,
       1
+    ],
+    "00c56905": [
+      2
     ],
     "96ecc032": [
       4
@@ -832,9 +839,6 @@
       0,
       1
     ],
-    "411abe35": [
-      11
-    ],
     "7119eaad": [
       13,
       0,
@@ -863,9 +867,6 @@
       13,
       0,
       1
-    ],
-    "54c8a00e": [
-      6
     ],
     "724b6078": [
       7
@@ -1027,6 +1028,9 @@
       13,
       0,
       1
+    ],
+    "2587a0cd": [
+      11
     ],
     "008cd14f": [
       13,
@@ -1253,9 +1257,6 @@
       0,
       1
     ],
-    "43c71d66": [
-      6
-    ],
     "2c14b6d7": [
       13,
       0,
@@ -1277,8 +1278,8 @@
       0,
       1
     ],
-    "8f7521b0": [
-      11
+    "748353ea": [
+      6
     ],
     "0d8d313d": [
       13,
@@ -1346,9 +1347,6 @@
       0,
       1
     ],
-    "77db4a6c": [
-      11
-    ],
     "6d19fa33": [
       13,
       0,
@@ -1388,6 +1386,9 @@
       13,
       0,
       1
+    ],
+    "19bab52b": [
+      11
     ],
     "4f0a0ab3": [
       4
@@ -1460,9 +1461,6 @@
       13,
       0,
       1
-    ],
-    "fb964098": [
-      2
     ],
     "dabfb3a2": [
       7
@@ -1651,6 +1649,9 @@
     ],
     "4e546857": [
       7
+    ],
+    "d4e9ffd0": [
+      2
     ],
     "f4da9c26": [
       13,

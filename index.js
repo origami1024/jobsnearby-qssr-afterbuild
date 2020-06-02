@@ -2922,6 +2922,7 @@ module.exports.extendApp = function ({ app, ssr }) {
   //app.use(cookieParser('qwekkk-12345'))
   app.use(cookieParser())
 
+
   app.get('/jobs.json', db.getJobs)
   app.get('/salstats.json', db.getSalStats)
   app.get('/jobby.idjson=:id', db.getJobByIdJSON)
@@ -2941,6 +2942,8 @@ module.exports.extendApp = function ({ app, ssr }) {
   app.post('/cvupdate.json', db.cvurlupdate)
   app.post('/cvdelete.json', db.cvurldelete)
   
+  app.post('/setlang', db.setLangCookie)
+
   app.post('/hitjobcv', db.hitjobcv)
 
 
@@ -2991,23 +2994,10 @@ module.exports.extendApp = function ({ app, ssr }) {
   app.post('/userstatregen.json', adm.userStatRegen)
   // aa end
   
+
+
+
   //ssr stuff
-  //0 -- wait! on what route is this? on any first route?
-  //0 -- think this trhourh
-  /*AUTH ROUTE WOT? NO SUCH ROUTE ON SSR
-  app.post('/auth', async function (req, res, next) {
-    if (authPreValidation(req.cookies.session, req.cookies.mail)) {
-      req.userData = await db.getUserAuthByCookies(req.cookies.session, req.cookies.mail).catch(error => {
-        console.log('getUserAuthByCookies. xxx', error)
-        return 'error1'
-      })
-    } else {
-      //empty or not valid auth data
-      req.userData = 'noauth'
-    }
-    
-    next()
-  })*/
   //1
   app.get('/', async function (req, res, next) {
     //auth first
@@ -3303,6 +3293,13 @@ function validateOneJob (data) {
   return parsedData
 }
 
+
+async function setLangCookie(req, res) {
+  let lang = req.body.lang
+  // console.log('lang, settings cookies:', lang)
+  res.cookie('lang', lang)
+  res.send('have a nice cookies')
+}
 
 async function resend(req, res) {
   //page with form to request a resend
@@ -3673,8 +3670,8 @@ async function addJobs (req, res) {
     let last_posted = results.rows[0].last_posted
     let limitCount = parseInt(results.rows[0].new_jobs_count_today)
     if (!limitCount) limitCount = 0
-    console.log('cp77', last_posted)
-    console.log('cp78', limitCount)
+    // console.log('cp77', last_posted)
+    // console.log('cp78', limitCount)
     if (limitCount >= DAILY_JOBS_LIMIT && parseInt(last_posted) != NaN && parseInt(last_posted) < 0 && parseInt(last_posted) > -JOBS_LIMIT_DURATION) {//-86400
       res.send({msg: 'error limits reached', added: 0, total: req.body.length})
       return false
@@ -3971,7 +3968,7 @@ async function updateJob (req, res) {
       let jid = req.body.job_id
       if (isNaN(jid) != false || !Number.isInteger(Number(jid)) || jid < 0) {
         res.send('wrong job id: ' + jid)
-        console.log('cp34: ', jid)
+        // console.log('cp34: ', jid)
         return false
       }
       let parsedData = validateOneJob(req.body)
@@ -4019,8 +4016,8 @@ async function addOneJob (req, res) {
       let last_posted = results.rows[0].last_posted
       let limitCount = parseInt(results.rows[0].new_jobs_count_today)
       if (!limitCount) limitCount = 0
-      console.log('cp67', last_posted)
-      console.log('cp68', limitCount)
+      // console.log('cp67', last_posted)
+      // console.log('cp68', limitCount)
       if (limitCount >= DAILY_JOBS_LIMIT && parseInt(last_posted) != NaN && parseInt(last_posted) < 0 && parseInt(last_posted) > -JOBS_LIMIT_DURATION) {//-86400
         res.send('error limits reached')
         return false
@@ -4598,7 +4595,6 @@ async function getCompanyById(req, res) {
     res.status(400).send('Неправильный id компании.')
     return false
   }
-  console.log('cp1')
   let que = `
     SELECT company, logo_url, domains, website, full_description, users.time_created, count(*) as jobs_count
     FROM users JOIN jobs ON (jobs.author_id = users.user_id)
@@ -4610,7 +4606,6 @@ async function getCompanyById(req, res) {
     //throw new Error('job by id error')
     return false
   })
-  console.log('cp2')
   let company
   if (result.rows && result.rows.length === 1) company = result.rows[0]
   else {
@@ -4719,7 +4714,6 @@ async function changeuserstuff(req, res) {
       return undefined
     })
     if (user_id) {
-      console.log('cp256: ', user_id, udata)
       let doit = await updateUserData(user_id, udata).catch(error => {
         res.send('step3')
         return undefined
@@ -4946,7 +4940,7 @@ async function login(req, res) {
       userData = userData.rows[0]
       userData.identity = mail
     }
-    // console.log('cp77', userData)
+    
     if (userData) {
       //check if blockd
       if (userData.is_active == false) {
@@ -5122,6 +5116,8 @@ module.exports = {
   reg,
   out,
   
+  setLangCookie,
+
   verify,
 
   feedback,
@@ -6536,7 +6532,6 @@ async function deleteJobByIdAdmin(req, res) {
 
 async function userStatRegen(req, res) {
   //generate new stuff
-  console.log('cp1')
   if (req.cookies && req.cookies.sessioa && req.cookies.sessioa.length > 50 && req.cookies.user2) {
     let auth = await adminAuth(req.cookies.user2, req.cookies.sessioa).catch(error => {
       //res.send('step2')
@@ -6566,7 +6561,6 @@ async function userStatRegen(req, res) {
         console.log('cp userStatRegen err1: ', error)
         return false
       })
-      console.log('cp2', result)
       let resubig = []
       let resu = {}
       if (result && result.rows && result.rows.length > 0) {
@@ -6580,7 +6574,6 @@ async function userStatRegen(req, res) {
           salMinCurr = 'm'
         }
         
-        console.log('cp3', resu.salMin)
         let que = `
           UPDATE cached_salary_stats
           SET (statvalue, statcurrency, time_updated) = (${salMin}, '${salMinCurr}', NOW())
@@ -6593,8 +6586,6 @@ async function userStatRegen(req, res) {
 
       }
       resubig.push(resu)
-      
-      console.log('cp4', resubig)
 
 
       let que3 = 'SELECT salary_min, salary_max, currency FROM jobs'
