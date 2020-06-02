@@ -12,7 +12,7 @@
     "js/7.c695cf7f.js",
     "js/8.cd79171c.js",
     "js/9.d032225a.js",
-    "js/app.33a83cad.js",
+    "js/app.474c08c9.js",
     "js/runtime.3ddbca80.js",
     "js/vendor.9d34b434.js",
     "statics/app-logo-128x128.png",
@@ -34,7 +34,7 @@
   "initial": [
     "js/runtime.3ddbca80.js",
     "js/vendor.9d34b434.js",
-    "js/app.33a83cad.js"
+    "js/app.474c08c9.js"
   ],
   "async": [
     "js/10.cda64ed0.js",
