@@ -12,7 +12,7 @@
     "js/7.cdbaeda0.js",
     "js/8.cd79171c.js",
     "js/9.d032225a.js",
-    "js/app.1f83d656.js",
+    "js/app.fd6d6c72.js",
     "js/runtime.3582e49e.js",
     "js/vendor.9d34b434.js",
     "statics/BebasNeue.ttf",
@@ -36,7 +36,7 @@
   "initial": [
     "js/runtime.3582e49e.js",
     "js/vendor.9d34b434.js",
-    "js/app.1f83d656.js"
+    "js/app.fd6d6c72.js"
   ],
   "async": [
     "js/10.fd524068.js",

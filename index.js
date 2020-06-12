@@ -6493,7 +6493,7 @@ async function approveJobByIdAdmin(req, res) {
       //если есть в базе и автор сам удаляющий
       //удалить
       
-      let que2nd = `UPDATE jobs SET (is_published, time_updated, closed_why) = (TRUE, NOW(), '') WHERE job_id = $1 RETURNING title, city`
+      let que2nd = `UPDATE jobs SET (is_published, time_updated, closed_why) = (TRUE, NOW(), '') WHERE job_id = $1 RETURNING title, salary_min, salary_max, description, city`
       let params2nd = [jid]
       pool.query(que2nd, params2nd, (error2, results2) => {
         if (error2) {
@@ -6502,10 +6502,17 @@ async function approveJobByIdAdmin(req, res) {
           return false
         }
         res.status(200).send('OK')
-        //here we go with telegram
-        const python = spawn('python', ['tg_bot.py', 'большой пробелX', jid , '1001 баков', 'чотам еще было', 'i do not recollect'])
-        console.log('cp21', process.cwd())
-        console.log('cp22', results2.rows[0])
+        //here we go with telegram - start python script
+        const python = spawn('python', [
+          'tg_bot.py',
+          results2.rows[0].title,
+          results2.rows[0].salary_min + ' - ' + results2.rows[0].salary_max,
+          results2.rows[0].desc.substring(0,50),
+          results2.rows[0].desc.substring(50, 100),
+          results2.rows[0].city,
+          jid])
+        // console.log('cp21', process.cwd())
+        // console.log('cp22', results2.rows[0])
         //
         addLog('Вакансия одобрена(A)', 'Id вакансии: ' + jid, results.rows[0].u2id, '(Модератор) ' + req.cookies.user2)
       })
