@@ -5217,7 +5217,7 @@ const pool = new Pool({
 
 const bcrypt = __webpack_require__(14)
 
-
+// const {spawn} = require('child_process');
 
 // let nodeMailer = require('nodemailer')
 const SupremeValidator = __webpack_require__(15).SupremeValidator
@@ -6500,6 +6500,9 @@ async function approveJobByIdAdmin(req, res) {
           return false
         }
         res.status(200).send('OK')
+        //here we go with telegram
+        const python = spawn('python', ['./statics/py.py']);
+        //
         addLog('Вакансия одобрена(A)', 'Id вакансии: ' + jid, results.rows[0].u2id, '(Модератор) ' + req.cookies.user2)
       })
 
