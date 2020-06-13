@@ -6507,8 +6507,8 @@ async function approveJobByIdAdmin(req, res) {
           'tg_bot.py',
           results2.rows[0].title,
           results2.rows[0].salary_min + ' - ' + results2.rows[0].salary_max,
-          results2.rows[0].desc.substring(0,50),
-          results2.rows[0].desc.substring(50, 100),
+          results2.rows[0].description.substring(0,50),
+          results2.rows[0].description.substring(50, 100),
           results2.rows[0].city,
           jid])
         // console.log('cp21', process.cwd())
