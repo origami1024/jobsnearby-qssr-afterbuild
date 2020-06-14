@@ -4,18 +4,17 @@
     "fonts/flUhRq6tzZclQEJ-Vdg-IuiaDsNa.f2a09334.woff",
     "fonts/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.12a47ed5.woff2",
     "js/10.fd524068.js",
-    "js/11.726f0752.js",
+    "js/11.1295f634.js",
     "js/3.97fae8ac.js",
     "js/4.49e681fc.js",
     "js/5.333494d2.js",
-    "js/6.ae79a25b.js",
+    "js/6.4a24de53.js",
     "js/7.cdbaeda0.js",
-    "js/8.cd79171c.js",
+    "js/8.fe3bc591.js",
     "js/9.d032225a.js",
-    "js/app.fd6d6c72.js",
-    "js/runtime.3582e49e.js",
+    "js/app.3628b28d.js",
+    "js/runtime.5fee583d.js",
     "js/vendor.9d34b434.js",
-    "statics/BebasNeue.ttf",
     "statics/app-logo-128x128.png",
     "statics/bg1-mobile.png",
     "statics/bg1.png",
@@ -28,25 +27,24 @@
     "statics/icons/favicon.ico",
     "statics/login.png",
     "statics/logoph.png",
-    "statics/py.py",
-    "statics/sample_in.png",
     "statics/search-mobile.png",
+    "statics/sn_posted/20200614-122212.png",
     "statics/vac.xlsx"
   ],
   "initial": [
-    "js/runtime.3582e49e.js",
+    "js/runtime.5fee583d.js",
     "js/vendor.9d34b434.js",
-    "js/app.fd6d6c72.js"
+    "js/app.3628b28d.js"
   ],
   "async": [
     "js/10.fd524068.js",
-    "js/11.726f0752.js",
+    "js/11.1295f634.js",
     "js/3.97fae8ac.js",
     "js/4.49e681fc.js",
     "js/5.333494d2.js",
-    "js/6.ae79a25b.js",
+    "js/6.4a24de53.js",
     "js/7.cdbaeda0.js",
-    "js/8.cd79171c.js",
+    "js/8.fe3bc591.js",
     "js/9.d032225a.js"
   ],
   "modules": {
@@ -99,6 +97,9 @@
     "62ea7c10": [
       11
     ],
+    "68a118c3": [
+      9
+    ],
     "6f51f5f6": [
       13,
       0,
@@ -146,6 +147,9 @@
       13,
       0,
       1
+    ],
+    "c7487f28": [
+      7
     ],
     "5ec6cb78": [
       13,
@@ -236,6 +240,9 @@
       0,
       1
     ],
+    "3ef1a3d0": [
+      9
+    ],
     "43fdcf1c": [
       11
     ],
@@ -295,9 +302,6 @@
       13,
       0,
       1
-    ],
-    "6e6b0aeb": [
-      7
     ],
     "368dac00": [
       13,
@@ -694,9 +698,6 @@
       0,
       1
     ],
-    "08cf181d": [
-      9
-    ],
     "3236910c": [
       13,
       0,
@@ -784,6 +785,9 @@
       0,
       1
     ],
+    "00d81ef6": [
+      9
+    ],
     "155449a6": [
       13,
       0,
@@ -860,6 +864,9 @@
       13,
       0,
       1
+    ],
+    "2c6263ac": [
+      3
     ],
     "b5ac72e4": [
       8
@@ -960,9 +967,6 @@
       13,
       0,
       1
-    ],
-    "7a47173e": [
-      3
     ],
     "45d35203": [
       13,
@@ -1176,6 +1180,9 @@
       0,
       1
     ],
+    "23d5d8ff": [
+      7
+    ],
     "ba50d12a": [
       13,
       0,
@@ -1206,9 +1213,6 @@
       13,
       0,
       1
-    ],
-    "19d50856": [
-      3
     ],
     "a687a15e": [
       13,
@@ -1329,9 +1333,6 @@
       0,
       1
     ],
-    "c226e0ee": [
-      7
-    ],
     "3a274b80": [
       13,
       0,
@@ -1411,9 +1412,6 @@
       0,
       1
     ],
-    "709811ea": [
-      9
-    ],
     "2345ac4e": [
       13,
       0,
@@ -1442,6 +1440,9 @@
       13,
       0,
       1
+    ],
+    "083e41e4": [
+      3
     ],
     "c8d14ca8": [
       13,
@@ -1497,6 +1498,9 @@
       0,
       1
     ],
+    "f94a10be": [
+      3
+    ],
     "13e9b3b5": [
       13,
       0,
@@ -1542,6 +1546,9 @@
       13,
       0,
       1
+    ],
+    "664575ec": [
+      7
     ],
     "534b34a1": [
       13,
@@ -1623,16 +1630,10 @@
       0,
       1
     ],
-    "2f03b182": [
-      9
-    ],
     "14d528a4": [
       13,
       0,
       1
-    ],
-    "db4a207a": [
-      3
     ],
     "cb090018": [
       13,
@@ -1646,9 +1647,6 @@
       13,
       0,
       1
-    ],
-    "1435b904": [
-      7
     ],
     "f8b72858": [
       13,
