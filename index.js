@@ -4581,7 +4581,8 @@ async function hitJobById (job_id, ip) {
   pool.query(que, params, (error, results1) => {
     if (error) {
       console.log('hitJobById Error: ', error)
-    } else console.log('job hit')
+    }
+    // else console.log('job hit')
   })
 }
 
@@ -5484,6 +5485,11 @@ async function adminPanel(req, res) {
                   Числа
                 </a>
               </li>
+              <li>
+                <a href="/snpics.json">
+                  Соц сети
+                </a>
+              </li>
               ${auth.category_rights === '777'
                 ? `<li>
                   <a href="/cpsuper.json">Суперадмин</a>
@@ -6255,13 +6261,13 @@ async function snpics(req, res) {
       return undefined
     })
     if (auth) {
-      var body = '<div style="width: 100%; margin: auto; font-size: 20px; font-weight: 600;">Последнее отправленное в соцсети</div><div>' + pageParts.cplink() + '</div><hr><ul>'
-      let files = await fs.promises.readdir('./www/statics/sn_posted')
+      var body = '<div style="text-align: center; margin: 15px auto; font-size: 22px; font-weight: 600;">Последнее отправленное в соцсети</div><div>' + pageParts.cplink() + '</div><hr><ul>'
+      let files = await fs.promises.readdir('./www/statics/sn_posted').catch(e => {})
         //  ./src/statics
       if (files) {
         files.forEach(file => {
           // console.log('ppp', file)
-          body += `<li style="display:flex;align-items:center;"><img style="max-width: 300px; max-height: 200px;" src="http://localhost:8080/statics/${file}"><a href="https://hunarmen.com/sn_posted/${file}">${file}</a></li>`
+          body += `<li style="width: 100%; margin-bottom: 15px; display:flex;align-items:center;"><img style="max-width: 300px; max-height: 200px; margin-right: 10px;" src="https://hunarmen.com/statics/sn_posted/${file}"> <a href="https://hunarmen.com/statics/sn_posted/${file}" download>${file}</a></li>`
         })
       }
       body += '</ul>'
