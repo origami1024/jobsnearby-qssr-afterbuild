@@ -6055,6 +6055,7 @@ async function adminJobs(req, res) {
                 ? ''
                 : `<button id="btn_apr_${val.job_id}" style="padding:0" onclick="sendaprjob(${val.job_id})">Одобрить</button>`
               }
+              <a href="/statics/sn_posted/${val.job_id}.png" download style="margin: 0 5px;">соцпик</a>
             </td>
           </tr>
         `
@@ -6525,7 +6526,7 @@ async function approveJobByIdAdmin(req, res) {
       //если есть в базе и автор сам удаляющий
       //удалить
       
-      let que2nd = `UPDATE jobs SET (is_published, time_updated, closed_why) = (TRUE, NOW(), '') WHERE job_id = $1 RETURNING title, salary_min, salary_max, description, city`
+      let que2nd = `UPDATE jobs SET (is_published, time_updated, closed_why) = (TRUE, NOW(), '') WHERE job_id = $1 RETURNING title, salary_min, salary_max, city, currency`
       let params2nd = [jid]
       pool.query(que2nd, params2nd, (error2, results2) => {
         if (error2) {
@@ -6538,9 +6539,9 @@ async function approveJobByIdAdmin(req, res) {
         const python = spawn('python', [
           'sn_bot.py',
           results2.rows[0].title,
-          results2.rows[0].salary_min + ' - ' + results2.rows[0].salary_max,
-          results2.rows[0].description.substring(0,50),
-          results2.rows[0].description.substring(50, 100),
+          results2.rows[0].salary_min + ' - ' + results2.rows[0].salary_max + results2.rows[0].currency,
+          // results2.rows[0].description.substring(0,50),
+          // results2.rows[0].description.substring(50, 100),
           results2.rows[0].city,
           jid])
         // console.log('cp21', process.cwd())
