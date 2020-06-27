@@ -4210,6 +4210,7 @@ async function updateOneCompanyPicX(req, res) {
         fs.unlink(path_part1 + '.jpg', (err) => {})
         fs.unlink(path_part1 + '.gif', (err) => {})
         fs.unlink(path_part1 + '.webp', (err) => {})
+        console.log(image.mimetype)
         if (image.mimetype == 'image/png') ext = '.png'
         else if (image.mimetype == 'image/jpeg') ext = '.jpg'
         else if (image.mimetype == 'image/gif') ext = '.gif'
