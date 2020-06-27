@@ -3294,7 +3294,7 @@ function validateOneJob (data) {
     parsedData.langs = langsFiltered
   } else parsedData.langs = []
   //edu - необязат, от 2х символов до 20
-  if (data.edu && data.edu.length > 1 && data.edu.length < 21) {
+  if (data.edu && data.edu.length > 1 && data.edu.length < 61) {
     parsedData.edu = data.edu
   } else parsedData.edu = ''
   //experience - стаж в годах, дробное число от 0 до 250
@@ -6261,6 +6261,7 @@ async function adminJobs(req, res) {
           }
           document.getElementById("title-filter-inp").addEventListener('input', filterInput)
           function sendPicRegen(event, title, sal, city, jid) {
+            if (sal.startsWith('0 - 0')) sal = 'По итогам собеседования'
             let d = {title, sal, city, jid}
             var http = new XMLHttpRequest()
             var url = '/socpicbyparams.json'
@@ -6861,7 +6862,7 @@ async function userStatRegen(req, res) {
       resubig.push(resu)
 
 
-      let que3 = 'SELECT salary_min, salary_max, currency FROM jobs'
+      let que3 = 'SELECT salary_min, salary_max, currency FROM jobs WHERE is_closed = false AND is_published = true'
       var result = await pool.query(que3, null).catch(error => {
         console.log('cp userStatRegen err5: ', error)
         return false
@@ -6898,7 +6899,7 @@ async function userStatRegen(req, res) {
         })
       }
 
-      let que4 = `SELECT title, job_id, salary_min, salary_max, currency FROM jobs WHERE time_updated > now() - interval '1 month'`
+      let que4 = `SELECT title, job_id, salary_min, salary_max, currency FROM jobs WHERE time_updated > now() - interval '1 month' AND is_closed = false AND is_published = true`
       var result = await pool.query(que4, null).catch(error => {
         console.log('cp userStatRegen err7: ', error)
         return false
