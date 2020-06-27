@@ -3014,6 +3014,9 @@ module.exports.extendApp = function ({ app, ssr }) {
   app.post('/admnjobapr.json', adm.approveJobByIdAdmin)
   app.post('/auaction.json', adm.auaction)
   app.post('/userstatregen.json', adm.userStatRegen)
+
+  app.post('/socpicbyparams.json', adm.createSocialPicByParams)
+  
   // aa end
   
 
@@ -5934,7 +5937,7 @@ async function adminGetUsers() {
   let que = `
     SELECT *
     FROM "users"
-    ORDER BY user_id DESC
+    ORDER BY time_updated DESC
   `
   let result = await pool.query(que, null).catch(error => {
     console.log('cp adminGetUsers err1: ', error)
@@ -6080,7 +6083,7 @@ async function adminGetJobs() {
       let que = `
         SELECT *
         FROM "jobs"
-        ORDER BY time_created DESC
+        ORDER BY time_updated DESC
 
       `
       let result = await pool.query(que, null).catch(error => {
@@ -6102,6 +6105,12 @@ async function adminJobs(req, res) {
       return undefined
     })
     if (auth) {
+      let data = await adminGetJobs().catch(error => {
+        console.log('cp adminGetJobs err1: ', error)
+        return []
+      })
+
+
       let body = `
         <style>
         .hidden {
@@ -6111,13 +6120,13 @@ async function adminJobs(req, res) {
         a {color:blue; text-decoration: none}
         a:visited {color:blue}
         </style>
-        <h2 style="text-align:center; margin: 0;">Вакансии</h2>
+        <h2 style="text-align:center; margin: 0;">Вакансии (${data.length})</h2>
         ${pageParts.cplink()}
         <table style="width: 100%; font-size:14px">
           <thead style="background-color: purple; color: white;">
             <tr style="padding: 5px">
               <td>jid</td>
-              <td>title</td>
+              <td>title<input id="title-filter-inp" style="margin-left: 10px;" type="text" placeholder="filter"></td>
               <td>aid</td>
               <td>time_updated</td>
               <td>is_published</td>
@@ -6132,10 +6141,7 @@ async function adminJobs(req, res) {
           <tbody>
         
       `
-      let data = await adminGetJobs().catch(error => {
-        console.log('cp adminGetJobs err1: ', error)
-        return []
-      })
+      
       
       data.forEach(val=>{
         let d = new Date(val.time_updated).toString().split(' GMT')[0].substring(3)
@@ -6151,7 +6157,7 @@ async function adminJobs(req, res) {
             <td>${val.contact_tel}</td>
             <td id="td_ic_${val.job_id}">${val.is_closed}</td>
             <td id="td_cw_${val.job_id}">${val.closed_why}</td>
-            <td style="width: 180px; display: flex">
+            <td style="width: 210px; display: flex">
               ${val.is_closed == false
                 ? `
                   <div id="cl_ctr_${val.job_id}">
@@ -6169,7 +6175,8 @@ async function adminJobs(req, res) {
                 ? ''
                 : `<button id="btn_apr_${val.job_id}" style="padding:0" onclick="sendaprjob(${val.job_id})">Одобрить</button>`
               }
-              <a href="/statics/sn_posted/${val.job_id}.png" download style="margin: 0 5px;">соцпик</a>
+              <a href="/statics/sn_posted/${val.job_id}.png?rand=${Date.now()}" download style="margin: 0 5px;">соцпик</a>
+              <button onclick='sendPicRegen(event, "${val.title}","${val.salary_min + ' - ' + val.salary_max + val.currency}","${val.city}", "${val.job_id}")'>🔄</button>
             </td>
           </tr>
         `
@@ -6240,6 +6247,34 @@ async function adminJobs(req, res) {
               }
             }
             http.send(JSON.stringify(d))
+          }
+          function filterInput() {
+            let needle = document.getElementById("title-filter-inp").value.toLowerCase()
+            let trs = [...document.querySelectorAll('[id^="jtr_"]')]
+            trs.forEach(el => {
+              let currentText = el.querySelectorAll('td')[1].getElementsByTagName('a')[0].textContent.toLowerCase()
+              if (needle != '' && !currentText.includes(needle))
+                el.classList.add('hidden')
+              else
+                el.classList.remove('hidden')
+            })
+          }
+          document.getElementById("title-filter-inp").addEventListener('input', filterInput)
+          function sendPicRegen(event, title, sal, city, jid) {
+            let d = {title, sal, city, jid}
+            var http = new XMLHttpRequest()
+            var url = '/socpicbyparams.json'
+            http.open('POST', url, true)
+            http.setRequestHeader('Content-type', 'application/json')
+            //
+            http.onreadystatechange = function() {
+              if(http.readyState == 4 && http.status == 200) {
+                console.log('cpo2: ', http.responseText)
+                alert('Картинка сгенерирована')
+              }
+            }
+            http.send(JSON.stringify(d))
+            event.target.previousElementSibling.setAttribute("href", "/statics/sn_posted/" + jid + ".png?rand=" + Date.now())
           }
         </script>
       `
@@ -6381,7 +6416,7 @@ async function snpics(req, res) {
       if (files) {
         files.forEach(file => {
           // console.log('ppp', file)
-          body += `<li style="width: 100%; margin-bottom: 15px; display:flex;align-items:center;"><img style="max-width: 300px; max-height: 200px; margin-right: 10px;" src="https://hunarmen.com/statics/sn_posted/${file}"> <a href="https://hunarmen.com/statics/sn_posted/${file}" download>${file}</a></li>`
+          body += `<li style="width: 100%; margin-bottom: 15px; display:flex;align-items:center;"><img style="max-width: 300px; max-height: 200px; margin-right: 10px;" src="https://hunarmen.com/statics/sn_posted/${file}"> <a href="https://hunarmen.com/statics/sn_posted/${file}?rand=${Date.now()}" download>${file}</a></li>`
         })
       }
       body += '</ul>'
@@ -6631,6 +6666,38 @@ async function closeJobByIdAdmin(req, res) {
     })
   } else {res.send('wrong userinfo(closeJBIA)')}
 }
+async function createSocialPicByParams(req, res) {
+  
+  if (req.cookies.sessioa && req.cookies.sessioa.length > 50 && req.cookies.user2) {
+    let que1st = `SELECT u2id FROM "users2" WHERE "u2coo" = $1 AND "u2mail" = $2`
+    let params1st = [req.cookies.sessioa, req.cookies.user2]
+    pool.query(que1st, params1st, (error, results) => {
+      if (error) {
+        console.log(error)
+        res.send('step2')
+        //throw error
+        return false
+      }
+      if (results.rows.length < 1) {
+        console.log('no cookie found')
+        //Если юзера с таким куки не найдено, то выходим из функции прост
+        res.send('step3')
+        return false
+      }
+      console.log('cp1412', req.body)
+      
+      const python = spawn('python', [
+        'justdraw.py',
+        req.body.title,
+        req.body.sal,
+        req.body.city,
+        req.body.jid
+      ])
+      res.send('OK')
+    })
+    
+  } else res.status(400).send('Что-то пошло не туда')
+}
 
 
 async function approveJobByIdAdmin(req, res) {
@@ -6675,8 +6742,6 @@ async function approveJobByIdAdmin(req, res) {
           'sn_bot.py',
           results2.rows[0].title,
           results2.rows[0].salary_min + ' - ' + results2.rows[0].salary_max + results2.rows[0].currency,
-          // results2.rows[0].description.substring(0,50),
-          // results2.rows[0].description.substring(50, 100),
           results2.rows[0].city,
           jid])
         // console.log('cp21', process.cwd())
@@ -6984,7 +7049,8 @@ module.exports = {
   userStatRegen,
 
   snpics,
-  deleteSnpics
+  deleteSnpics,
+  createSocialPicByParams
 }
 
 /***/ }),
