@@ -6,15 +6,15 @@
     "js/10.fd524068.js",
     "js/11.869b780a.js",
     "js/3.6508ebb4.js",
-    "js/4.49e681fc.js",
+    "js/4.e53f53f5.js",
     "js/5.333494d2.js",
     "js/6.4a24de53.js",
     "js/7.cdbaeda0.js",
     "js/8.fe3bc591.js",
     "js/9.d032225a.js",
-    "js/app.96ce61ce.js",
-    "js/runtime.4aa3d4a9.js",
-    "js/vendor.9d34b434.js",
+    "js/app.f40804ad.js",
+    "js/runtime.256c3229.js",
+    "js/vendor.d78e370a.js",
     "statics/app-logo-128x128.png",
     "statics/bg1-mobile.png",
     "statics/bg1.png",
@@ -29,18 +29,20 @@
     "statics/logoph.png",
     "statics/search-mobile.png",
     "statics/sn_posted/1232.png",
+    "statics/sn_posted/sample1_in.png",
+    "statics/sn_posted/sample2_in.png",
     "statics/vac.xlsx"
   ],
   "initial": [
-    "js/runtime.4aa3d4a9.js",
-    "js/vendor.9d34b434.js",
-    "js/app.96ce61ce.js"
+    "js/runtime.256c3229.js",
+    "js/vendor.d78e370a.js",
+    "js/app.f40804ad.js"
   ],
   "async": [
     "js/10.fd524068.js",
     "js/11.869b780a.js",
     "js/3.6508ebb4.js",
-    "js/4.49e681fc.js",
+    "js/4.e53f53f5.js",
     "js/5.333494d2.js",
     "js/6.4a24de53.js",
     "js/7.cdbaeda0.js",
@@ -434,6 +436,9 @@
       0,
       1
     ],
+    "01ddada2": [
+      5
+    ],
     "69506b91": [
       13,
       0,
@@ -653,6 +658,9 @@
       0,
       1
     ],
+    "659f6ea2": [
+      5
+    ],
     "96ecc032": [
       4
     ],
@@ -775,9 +783,6 @@
       0,
       1
     ],
-    "350eb907": [
-      5
-    ],
     "765e7d6a": [
       13,
       0,
@@ -818,9 +823,6 @@
       13,
       0,
       1
-    ],
-    "4bc4cd1c": [
-      5
     ],
     "2cbe32e8": [
       13,
@@ -1273,8 +1275,10 @@
       0,
       1
     ],
-    "c8c6030c": [
-      5
+    "8fbafe20": [
+      13,
+      0,
+      1
     ],
     "d9b81e9c": [
       13,
@@ -1536,6 +1540,9 @@
       13,
       0,
       1
+    ],
+    "15c73d44": [
+      5
     ],
     "2c152658": [
       13,

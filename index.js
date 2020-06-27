@@ -348,10 +348,16 @@ module.exports = require("buffer");
 /* 3 */
 /***/ (function(module, exports) {
 
-module.exports = require("path");
+module.exports = require("fs");
 
 /***/ }),
 /* 4 */
+/***/ (function(module, exports) {
+
+module.exports = require("path");
+
+/***/ }),
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -624,7 +630,7 @@ function populateConstructorExports (exports, codes, HttpError) {
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -640,7 +646,7 @@ if (typeof process !== 'undefined' && process.type === 'renderer') {
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -657,7 +663,7 @@ if (typeof process !== 'undefined' && process.type === 'renderer') {
  * @private
  */
 
-var createError = __webpack_require__(4)
+var createError = __webpack_require__(5)
 var getBody = __webpack_require__(56)
 var iconv = __webpack_require__(19)
 var onFinished = __webpack_require__(76)
@@ -828,7 +834,7 @@ function contentstream (req, debug, inflate) {
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1101,12 +1107,6 @@ function tryNormalizeType (value) {
 
 
 /***/ }),
-/* 8 */
-/***/ (function(module, exports) {
-
-module.exports = require("fs");
-
-/***/ }),
 /* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1122,7 +1122,7 @@ module.exports = require("fs");
 
 var callSiteToString = __webpack_require__(16).callSiteToString
 var eventListenerCount = __webpack_require__(16).eventListenerCount
-var relative = __webpack_require__(3).relative
+var relative = __webpack_require__(4).relative
 
 /**
  * Module exports.
@@ -2787,8 +2787,8 @@ module.exports = require("compression");
  * DO NOT EDIT.
  **/
 
-const fs = __webpack_require__(8)
-const path = __webpack_require__(3)
+const fs = __webpack_require__(3)
+const path = __webpack_require__(4)
 const LRU = __webpack_require__(29)
 const { createBundleRenderer } = __webpack_require__(30)
 
@@ -2951,6 +2951,25 @@ module.exports.extendApp = function ({ app, ssr }) {
   // app.post('/getownjobscut.json', db.getOwnJobsCut)
   app.post('/ownCompany.json', db.getOwnCompanyJSON)
   app.post('/companyupdpic.json', db.updateOneCompanyPic)
+
+  const multer = __webpack_require__(91)
+  const upload = multer()
+  // var storage = multer.diskStorage({
+  //   destination: function (req, image, cb) {
+  //     cb(null, './uploads')
+  //   },
+  //   filename: function (req, image, cb) {
+  //     if (authPreValidation(req.signedCookies.session, req.signedCookies.mail)) {
+
+  //     }
+  //     console.log('cp13', req.signedCookies.session)
+  //     let ext = null
+  //     if (image.mimetype == 'image/png') ext = '.png'
+  //     cb(null, image.fieldname + '-' + Date.now())
+  //   }
+  // })
+  // upload = multer({ storage: storage })
+  app.post('/companyupdpicx.json', upload.single('image'), db.updateOneCompanyPicX)
   app.post('/companyUpdate.json', db.updateOneCompany)
 
   app.post('/getresps', db.getResps)
@@ -2985,6 +3004,7 @@ module.exports.extendApp = function ({ app, ssr }) {
   app.get('/u2out.json', adm.u2out)
   app.post('/newu2.json', adm.adminNew)
   app.get('/snpics.json', adm.snpics)
+  app.get('/deleteSnpics.json', adm.deleteSnpics)
   //CPEND
 
   //admin actions
@@ -3173,6 +3193,8 @@ const titleRegex = /^[\wа-яА-ЯÇçÄä£ſÑñňÖö$¢Üü¥ÿýŽžŞş\s\
 const bcrypt = __webpack_require__(14)
 
 let nodeMailer = __webpack_require__(35)
+
+const fs = __webpack_require__(3)
 
 const DAILY_JOBS_LIMIT = 30 //Макс кол-во вакансий в день(86400 сек, что указано ниже)
 const JOBS_LIMIT_DURATION = 86400 //86400 - 24 hours
@@ -4153,6 +4175,93 @@ async function updateOneCompany(req, res) {
 
 }
 
+async function updateOneCompanyPicX(req, res) {
+  //node version, receives pic file,
+  //!should delete old file by url from db, or do the replacement
+  //!in a way by storing by user name perhaps
+  //!url should not be set from outside
+  //check if file by url is in the proper dir
+  //need to think through how to make images not be lost between deployments
+  
+  if (authPreValidation(req.signedCookies.session, req.signedCookies.mail)) {
+    
+    let que1st = `SELECT user_id, logo_url, role FROM "users" WHERE auth_cookie = $1 AND email = $2 AND role = 'company'`
+    let params1st = [req.signedCookies.session, req.signedCookies.mail]
+    pool.query(que1st, params1st, (error, results) => {
+      if (error) {
+        res.send({success: false, msg: 'step2 err'})
+        console.log('updateOneCompanyPic Error: ', error)
+        return false
+      }
+      if (results.rows.length != 1 || results.rows[0].role != 'company') {
+        res.send({success: false, msg: 'step3 err'})
+        return false
+      }
+
+      let uid = results.rows[0].user_id
+      let logo_url = ''
+      let image = req.file
+      if (image.size < 409601) {
+        // console.log('cpx', image)
+        //delete old file ! done!
+        let ext = null
+        let path_part1 = 'uploads/' + uid
+        fs.unlink(path_part1 + '.png', (err) => {})
+        fs.unlink(path_part1 + '.jpg', (err) => {})
+        fs.unlink(path_part1 + '.gif', (err) => {})
+        fs.unlink(path_part1 + '.webp', (err) => {})
+        if (image.mimetype == 'image/png') ext = '.png'
+        else if (image.mimetype == 'image/jpeg') ext = '.jpg'
+        else if (image.mimetype == 'image/gif') ext = '.gif'
+        else if (image.mimetype == 'image/webp') ext = '.webp'
+        if (ext !== null) {
+          
+          let logo_url = path_part1 + ext  + '?rand=' + Date.now()
+          let dir = './www/uploads'
+          let fname = dir + '/' + uid + ext
+          if (!fs.existsSync(dir)){
+            fs.mkdirSync(dir);
+          }
+          fs.writeFile(fname, image.buffer, "binary", function(err) {
+            if(err) {
+              console.log(err);
+            }
+            // else console.log("The file was saved!");
+          })
+
+          let que2nd = `
+            UPDATE "users"
+            SET "logo_url" = $1
+            WHERE user_id = $2
+          `
+          let params2nd = [logo_url, uid]
+
+          pool.query(que2nd, params2nd, (error2, results2) => {
+            if (error2) {
+              console.log('updateOneCompanyPic, err2: ', error2)
+              res.send({success: false, msg: 'step4 err'})
+              return false
+            }
+            res.send({success: true, link: logo_url})
+          })
+        } else {
+          res.send({success: false, msg: 'file ext error'})
+          return false
+        }
+      } else {
+        res.send({success: false, msg: 'file size error'})
+        return false
+      }
+      //send back link or error
+      //check file size
+      //save logo url
+      //for new users make new url pointing to placeholder
+      
+      
+    })
+  } else res.send({success: false, msg: 'auth error'})
+
+}
 async function updateOneCompanyPic(req, res) {
   if (authPreValidation(req.signedCookies.session, req.signedCookies.mail)) {
     let que1st = `SELECT user_id, logo_url, role FROM "users" WHERE auth_cookie = $1 AND email = $2 AND role = 'company'`
@@ -5166,6 +5275,7 @@ module.exports = {
   getOwnJobs,
   getOwnCompanyJSON,
   updateOneCompanyPic,
+  updateOneCompanyPicX,
   updateOneCompany,
 
   addOneJob,
@@ -5223,6 +5333,9 @@ const pool = new Pool({
 const bcrypt = __webpack_require__(14)
 
 const {spawn} = __webpack_require__(38)
+
+const path = __webpack_require__(4)
+const fs = __webpack_require__(3)
 
 // let nodeMailer = require('nodemailer')
 const SupremeValidator = __webpack_require__(15).SupremeValidator
@@ -6253,8 +6366,7 @@ async function adminGetUsers2() {
   return resu
 }
 
-const path = __webpack_require__(3);
-const fs = __webpack_require__(8);
+
 
 async function snpics(req, res) {
   if (req.cookies && req.cookies.sessioa && req.cookies.sessioa.length > 50 && req.cookies.user2) {
@@ -6262,7 +6374,7 @@ async function snpics(req, res) {
       return undefined
     })
     if (auth) {
-      var body = '<div style="text-align: center; margin: 15px auto; font-size: 22px; font-weight: 600;">Последнее отправленное в соцсети</div><div>' + pageParts.cplink() + '</div><hr><ul>'
+      var body = '<div style="text-align: center; margin: 15px auto; font-size: 22px; font-weight: 600;">Последнее отправленное в соцсети</div><div>' + pageParts.cplink() + '</div>' + '<div><a href="/deleteSnpics.json">Удалить все</a></div>' + '<hr><ul>'
       let files = await fs.promises.readdir('./www/statics/sn_posted').catch(e => {})
         //  ./src/statics
       if (files) {
@@ -6272,11 +6384,33 @@ async function snpics(req, res) {
         })
       }
       body += '</ul>'
+      
       let html = pageParts.head + body + pageParts.footer
       res.send(html)
     } else res.send(pageParts.noau)
   } else res.send(pageParts.noau)
 }
+
+async function deleteSnpics(req, res) {
+  if (req.cookies && req.cookies.sessioa && req.cookies.sessioa.length > 50 && req.cookies.user2) {
+    let auth = await adminAuth(req.cookies.user2, req.cookies.sessioa).catch(error => {
+      return undefined
+    })
+    if (auth) {
+      fs.readdir('./www/statics/sn_posted', (err, files) => {
+        if (err) throw err;
+      
+        for (const file of files) {
+          fs.unlink(path.join('./www/statics/sn_posted', file), err => {
+            if (err) throw err;
+          });
+        }
+        res.redirect('/snpics.json')
+      })
+    } else res.send(pageParts.noau)
+  } else res.send(pageParts.noau)
+}
+
 async function superAdmin(req, res) {
   if (req.cookies && req.cookies.sessioa && req.cookies.sessioa.length > 50 && req.cookies.user2) {
     //auth check
@@ -6849,6 +6983,7 @@ module.exports = {
   userStatRegen,
 
   snpics,
+  deleteSnpics
 }
 
 /***/ }),
@@ -7232,10 +7367,10 @@ function eventListenerCount (emitter, type) {
 
 var bytes = __webpack_require__(1)
 var contentType = __webpack_require__(10)
-var createError = __webpack_require__(4)
-var debug = __webpack_require__(5)('body-parser:json')
-var read = __webpack_require__(6)
-var typeis = __webpack_require__(7)
+var createError = __webpack_require__(5)
+var debug = __webpack_require__(6)('body-parser:json')
+var read = __webpack_require__(7)
+var typeis = __webpack_require__(8)
 
 /**
  * Module exports.
@@ -8214,7 +8349,7 @@ function createWritableStdioStream (fd) {
       break;
 
     case 'FILE':
-      var fs = __webpack_require__(8);
+      var fs = __webpack_require__(3);
       stream = new fs.SyncWriteStream(fd, { autoClose: false });
       stream._type = 'fs';
       break;
@@ -8311,7 +8446,7 @@ module.exports = require("net");
  */
 
 var bytes = __webpack_require__(1)
-var createError = __webpack_require__(4)
+var createError = __webpack_require__(5)
 var iconv = __webpack_require__(19)
 var unpipe = __webpack_require__(75)
 
@@ -11881,7 +12016,7 @@ function splitType(string) {
  */
 
 var db = __webpack_require__(81)
-var extname = __webpack_require__(3).extname
+var extname = __webpack_require__(4).extname
 
 /**
  * Module variables.
@@ -12097,9 +12232,9 @@ module.exports = JSON.parse("{\"application/1d-interleaved-parityfec\":{\"source
  */
 
 var bytes = __webpack_require__(1)
-var debug = __webpack_require__(5)('body-parser:raw')
-var read = __webpack_require__(6)
-var typeis = __webpack_require__(7)
+var debug = __webpack_require__(6)('body-parser:raw')
+var read = __webpack_require__(7)
+var typeis = __webpack_require__(8)
 
 /**
  * Module exports.
@@ -12206,9 +12341,9 @@ function typeChecker (type) {
 
 var bytes = __webpack_require__(1)
 var contentType = __webpack_require__(10)
-var debug = __webpack_require__(5)('body-parser:text')
-var read = __webpack_require__(6)
-var typeis = __webpack_require__(7)
+var debug = __webpack_require__(6)('body-parser:text')
+var read = __webpack_require__(7)
+var typeis = __webpack_require__(8)
 
 /**
  * Module exports.
@@ -12336,11 +12471,11 @@ function typeChecker (type) {
 
 var bytes = __webpack_require__(1)
 var contentType = __webpack_require__(10)
-var createError = __webpack_require__(4)
-var debug = __webpack_require__(5)('body-parser:urlencoded')
+var createError = __webpack_require__(5)
+var debug = __webpack_require__(6)('body-parser:urlencoded')
 var deprecate = __webpack_require__(9)('body-parser')
-var read = __webpack_require__(6)
-var typeis = __webpack_require__(7)
+var read = __webpack_require__(7)
+var typeis = __webpack_require__(8)
 
 /**
  * Module exports.
@@ -13160,6 +13295,12 @@ module.exports = require("querystring");
 /***/ (function(module, exports) {
 
 module.exports = require("cookie-parser");
+
+/***/ }),
+/* 91 */
+/***/ (function(module, exports) {
+
+module.exports = require("multer");
 
 /***/ })
 /******/ ]);
