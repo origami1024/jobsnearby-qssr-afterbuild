@@ -3014,7 +3014,7 @@ module.exports.extendApp = function ({ app, ssr }) {
   app.post('/admnjobapr.json', adm.approveJobByIdAdmin)
   app.post('/auaction.json', adm.auaction)
   app.post('/userstatregen.json', adm.userStatRegen)
-
+  app.post('/forceedit.json', adm.forceEdit)
   app.post('/socpicbyparams.json', adm.createSocialPicByParams)
   
   // aa end
@@ -3708,8 +3708,7 @@ async function addJobs (req, res) {
     let last_posted = results.rows[0].last_posted
     let limitCount = parseInt(results.rows[0].new_jobs_count_today)
     if (!limitCount) limitCount = 0
-    // console.log('cp77', last_posted)
-    // console.log('cp78', limitCount)
+    
     if (limitCount >= DAILY_JOBS_LIMIT && parseInt(last_posted) != NaN && parseInt(last_posted) < 0 && parseInt(last_posted) > -JOBS_LIMIT_DURATION) {//-86400
       res.send({msg: 'error limits reached', added: 0, total: req.body.length})
       return false
@@ -6130,7 +6129,6 @@ async function adminJobs(req, res) {
               <td>aid</td>
               <td>time_updated</td>
               <td>is_published</td>
-              <td>currency</td>
               <td>contact_mail</td>
               <td>contact_tel</td>
               <td>Закрыта?</td>
@@ -6149,10 +6147,9 @@ async function adminJobs(req, res) {
           <tr id="jtr_${val.job_id}" ${(val.is_published == false && val.is_closed == false) ? 'style="font-weight: 700"' : ''}>
             <td>${val.job_id}</td>
             <td><a href="/jobpage?id=${val.job_id}" target="_blank">${val.title}</a></td>
-            <td>${val.author_id}</td>
+            <td><a href="/companypage?id=${val.author_id}" target="_blank">${val.author_id}</a></td>
             <td>${d}</td>
             <td id="td_apr_${val.job_id}">${val.is_published}</td>
-            <td>${val.currency}</td>
             <td>${val.contact_mail}</td>
             <td>${val.contact_tel}</td>
             <td id="td_ic_${val.job_id}">${val.is_closed}</td>
@@ -6176,13 +6173,20 @@ async function adminJobs(req, res) {
                 : `<button id="btn_apr_${val.job_id}" style="padding:0" onclick="sendaprjob(${val.job_id})">Одобрить</button>`
               }
               <a href="/statics/sn_posted/${val.job_id}.png?rand=${Date.now()}" download style="margin: 0 5px;">соцпик</a>
-              <button onclick='sendPicRegen(event, "${val.title}","${val.salary_min + ' - ' + val.salary_max + val.currency}","${val.city}", "${val.job_id}")'>🔄</button>
+              <button title="Перегенерировать картинку" onclick='sendPicRegen(event, "${val.title}","${val.salary_min + ' - ' + val.salary_max + val.currency}","${val.city}", "${val.job_id}")'>🔄</button>
+              <button title="Отредактировать название и описание" onclick='showEditModal(event, ${val.job_id}, "${val.title}", \`${val.description}\`)'>✍</button>
             </td>
           </tr>
         `
         body += tmp
       })
       body += '</tbody></table>'
+      body += `<div id="jobQuickEditModal" class="hidden" style="position: relative; background-color: lightblue; padding: 15px; position: absolute; top: calc(50% - 200px); left: calc(50% - 250px); z-index: 1;">
+        <input type="text" id="qem__title" style="display: block; width: 500px;">
+        <textarea id="qem__desc" style="display: block; width: 500px; height: 400px;"></textarea>
+        <button id="qem__btn" style="display: block" onclick="sendQuickEdits(event)" data-jid="-1">Отправить</button>
+        <button style="position: absolute; top: 0; right: 0;" onclick='document.getElementById("jobQuickEditModal").classList.add("hidden")'>X</button>
+      </div>`
       body += `
         <script>
           function popup(jid) {
@@ -6277,6 +6281,39 @@ async function adminJobs(req, res) {
             http.send(JSON.stringify(d))
             event.target.previousElementSibling.setAttribute("href", "/statics/sn_posted/" + jid + ".png?rand=" + Date.now())
           }
+          function showEditModal(event, jid, title, description) {
+            document.getElementById("qem__title").value = title;
+            document.getElementById("qem__desc").value = description;
+            document.getElementById("qem__btn").setAttribute("data-jid", jid);
+            document.getElementById("jobQuickEditModal").classList.remove("hidden")
+          }
+          function sendQuickEdits(event) {
+            let title = document.getElementById("qem__title").value
+            let desc = document.getElementById("qem__desc").value
+            let jid = document.getElementById("qem__btn").getAttribute("data-jid")
+            document.getElementById("qem__btn").setAttribute("data-jid", -1)
+            document.getElementById("jobQuickEditModal").classList.add("hidden")
+            console.log(title, desc, jid)
+            let d = {title, desc, jid}
+            var http = new XMLHttpRequest()
+            var url = '/forceedit.json'
+            http.open('POST', url, true)
+            http.setRequestHeader('Content-type', 'application/json')
+            //
+            http.onreadystatechange = function() {
+              if(http.readyState == 4 && http.status == 200) {
+                let resp = JSON.parse(http.response)
+                if (resp.success === "true")
+                  location.reload();
+                else if (resp.success === "false" && resp.msg)
+                  alert(resp.msg)
+                else console.log('error', resp)
+              }
+            }
+            http.send(JSON.stringify(d))
+            
+          }
+          
         </script>
       `
       let allJobsPage = pageParts.head + body + pageParts.footer
@@ -6739,10 +6776,12 @@ async function approveJobByIdAdmin(req, res) {
         }
         res.status(200).send('OK')
         //here we go with telegram - start python script
+        let sal = results2.rows[0].salary_min + ' - ' + results2.rows[0].salary_max + results2.rows[0].currency
+        if (sal.startsWith('0 - 0')) sal = 'По итогам собеседования'
         const python = spawn('python', [
           'sn_bot.py',
           results2.rows[0].title,
-          results2.rows[0].salary_min + ' - ' + results2.rows[0].salary_max + results2.rows[0].currency,
+          sal,
           results2.rows[0].city,
           jid])
         // console.log('cp21', process.cwd())
@@ -6754,6 +6793,60 @@ async function approveJobByIdAdmin(req, res) {
     })
   } else {res.send('wrong userinfo(approveJBIA)')}
 }
+
+
+async function forceEdit(req, res) {
+  const titleRegex = /^[\wа-яА-ЯÇçÄä£ſÑñňÖö$¢Üü¥ÿýŽžŞş\s\-\+\$\%\(\)\№\:\#\/]*$/
+  if (req.cookies.sessioa && req.cookies.sessioa.length > 50 && req.cookies.user2) {
+    let que1st = `SELECT u2id FROM "users2" WHERE "u2coo" = $1 AND "u2mail" = $2`
+    let params1st = [req.cookies.sessioa, req.cookies.user2]
+    pool.query(que1st, params1st, (error, results) => {
+      if (error) {
+        // res.send('step2')
+        res.send(JSON.stringify({"success": "false", "msg": "step2"}))
+        return false
+      }
+      if (!results.rows || results.rows.length != 1) {
+        // res.send('step3')
+        res.send(JSON.stringify({"success": "false", "msg": "step3"}))
+        return false
+      }
+      // console.log(req.body)
+      let data = req.body
+      let parsedData = {}
+      if (data.title && data.title.length > 1 && data.title.length < 76 && titleRegex.test(data.title)) {
+        parsedData.title = data.title
+      } else {
+        res.send(JSON.stringify({"success": "false", "msg": "title не прошел валидацию"}))
+        return false
+      }
+      if (data.desc && data.desc.length > 1 && data.desc.length < 2001) {
+        parsedData.description = data.desc
+      } else {
+        res.send(JSON.stringify({"success": "false", "msg": "Макс длина description 2000"}))
+        return false
+      }
+      let que2nd = `UPDATE "jobs" SET ("time_updated", "title", "description") =
+                    (NOW(), $1, $2)
+                    WHERE job_id = $3
+                    RETURNING job_id, title`
+      let params2nd = [parsedData.title, parsedData.description, data.jid]
+      // console.log('cp67', params2nd)
+      pool.query(que2nd, params2nd, (error2, results2) => {
+        if (error) {
+          res.send(JSON.stringify({"success": "false", "msg": "step22"}))
+          return false
+        }
+        if (results2.rows.length > 0) {
+          addLog('Вакансия исправлена(А)', parsedData.title, data.jid, '(Модератор) ' + req.cookies.user2)
+          res.send(JSON.stringify({"success": "true"}))
+        } else res.send(JSON.stringify({"success": "false", "msg": "Ошибка в бд"}))
+      })
+    })
+
+  } else res.send(JSON.stringify({"success": "false", "msg": "wrong userinfo"}))
+}
+
 
 async function deleteJobByIdAdmin(req, res) {
   const jid = parseInt(req.body.jid)
@@ -6927,11 +7020,20 @@ async function userStatRegen(req, res) {
         `
         for (let x1 = 0; x1 < 6; x1++) {
           //first five
-          quex += `
-            UPDATE cached_salary_stats SET 
-            (statvalue, time_updated, statlabel, statcurrency, statlink) = (${dataa[x1].salary_max}, NOW(), '${dataa[x1].title}', 'm', ${dataa[x1].job_id})
-            WHERE statname = 'top${x1 + 1}';
-          `
+          if (x1 < dataa.length) {
+            quex += `
+              UPDATE cached_salary_stats SET 
+              (statvalue, time_updated, statlabel, statcurrency, statlink) = (${dataa[x1].salary_max}, NOW(), '${dataa[x1].title}', 'm', ${dataa[x1].job_id})
+              WHERE statname = 'top${x1 + 1}';
+            `
+          } else {
+            quex += `
+              UPDATE cached_salary_stats SET 
+              (statvalue, time_updated, statlabel, statcurrency, statlink) = (0, NOW(), '-', 'm', -1)
+              WHERE statname = 'top${x1 + 1}';
+            `
+          }
+          
         }
 
         var result = await pool.query(quex, null).catch(error => {
@@ -7051,7 +7153,8 @@ module.exports = {
 
   snpics,
   deleteSnpics,
-  createSocialPicByParams
+  createSocialPicByParams,
+  forceEdit
 }
 
 /***/ }),
