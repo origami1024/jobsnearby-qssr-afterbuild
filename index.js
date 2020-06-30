@@ -1132,6 +1132,7 @@ const SupremeValidator = {
 
 function salaryDeriv (salary_min, salary_max, currency) {
   // let currency = $t('App.currencyDic')[this.job.currency]
+  console.log('cp exx1', salary_min, salary_max, currency)
   let res = ''
   if (salary_min < 1) {
     if (salary_max < 1) {
@@ -3326,7 +3327,7 @@ function validateOneJob (data) {
     parsedData.jcategory = Math.round(Number(data.jcategory))
   } else parsedData.jcategory = 0 //без категории = 0
   //city - необязат, от 2х символов до 100
-  if (data.city && data.city.length > 1 && data.city.length < 101) {
+  if (data.city && data.city.length > 1 && data.city.length < 71) {
     parsedData.city = data.city
   } else parsedData.city = ''
   //jobtype - постоянная, временная или пусто
@@ -6193,7 +6194,7 @@ async function adminJobs(req, res) {
                 : `<button id="btn_apr_${val.job_id}" style="padding:0" onclick="sendaprjob(${val.job_id})">Одобрить</button>`
               }
               <a href="/statics/sn_posted/${val.job_id}.png?rand=${Date.now()}" download style="margin: 0 5px;">соцпик</a>
-              <button title="Перегенерировать картинку" onclick='sendPicRegen(event, "${val.title}","${val.salary_min}, "${val.salary_max}", "${val.currency}","${val.city}", "${val.job_id}")'>🔄</button>
+              <button title="Перегенерировать картинку" onclick='sendPicRegen(event, "${val.title}","${val.salary_min}", "${val.salary_max}", "${val.currency}","${val.city}", "${val.job_id}")'>🔄</button>
               <button title="Отредактировать название и описание" onclick='showEditModal(event, ${val.job_id}, "${val.title}", \`${val.description}\`)'>✍</button>
             </td>
           </tr>
@@ -6285,7 +6286,7 @@ async function adminJobs(req, res) {
           }
           document.getElementById("title-filter-inp").addEventListener('input', filterInput)
           function sendPicRegen(event, title, sal_min, sal_max, cur, city, jid) {
-            if (sal.startsWith('0 - 0')) sal = 'По итогам собеседования'
+            // if (sal.startsWith('0 - 0')) sal = 'По итогам собеседования'
             let d = {title, sal_min, sal_max, cur, city, jid}
             var http = new XMLHttpRequest()
             var url = '/socpicbyparams.json'
@@ -6749,6 +6750,7 @@ async function createSocialPicByParams(req, res) {
         req.body.title,
         sal,
         req.body.city,
+        req.body.contact_tel,
         req.body.jid
       ])
       res.send('OK')
@@ -6794,6 +6796,12 @@ async function approveJobByIdAdmin(req, res) {
           res.status(400).send('error222')
           return false
         }
+        if (!results2.rows || results2.rows.length < 1) {
+          res.status(400).send('error223')
+          console.log('approveJobByIdAdmin Error3: ', error2)
+          addLog('Ошибка одобр(A)', 'Id вакансии: ' + jid, results.rows[0].u2id, '(Модератор) ' + req.cookies.user2)
+          return false
+        }
         res.status(200).send('OK')
         //here we go with telegram - start python script
         // let sal = results2.rows[0].salary_min + ' - ' + results2.rows[0].salary_max + results2.rows[0].currency
@@ -6804,6 +6812,7 @@ async function approveJobByIdAdmin(req, res) {
           results2.rows[0].title,
           sal,
           results2.rows[0].city,
+          results2.rows[0].contact_tel,
           jid])
         // console.log('cp21', process.cwd())
         // console.log('cp22', results2.rows[0])
