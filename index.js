@@ -2971,7 +2971,7 @@ module.exports.extendApp = function ({ app, ssr }) {
   app.post('/getownjobs.json', db.getOwnJobs)
   // app.post('/getownjobscut.json', db.getOwnJobsCut)
   app.post('/ownCompany.json', db.getOwnCompanyJSON)
-  app.post('/companyupdpic.json', db.updateOneCompanyPic)
+  // app.post('/companyupdpic.json', db.updateOneCompanyPic)
 
   const multer = __webpack_require__(91)
   const upload = multer()
@@ -2991,6 +2991,9 @@ module.exports.extendApp = function ({ app, ssr }) {
   // })
   // upload = multer({ storage: storage })
   app.post('/companyupdpicx.json', upload.single('image'), db.updateOneCompanyPicX)
+
+  app.post('/cvupdx.json', upload.single('cv'), db.cvUpdateX)
+
   app.post('/companyUpdate.json', db.updateOneCompany)
 
   app.post('/getresps', db.getResps)
@@ -4286,49 +4289,49 @@ async function updateOneCompanyPicX(req, res) {
   } else res.send({success: false, msg: 'auth error'})
 
 }
-async function updateOneCompanyPic(req, res) {
-  if (authPreValidation(req.signedCookies.session, req.signedCookies.mail)) {
-    let que1st = `SELECT user_id, logo_url, role FROM "users" WHERE auth_cookie = $1 AND email = $2 AND role = 'company'`
-    let params1st = [req.signedCookies.session, req.signedCookies.mail]
-    pool.query(que1st, params1st, (error, results) => {
-      if (error) {
-        res.send('step2')
-        console.log('updateOneCompanyPic Error: ', error)
-        return false
-      }
-      if (results.rows.length != 1 || results.rows[0].role != 'company') {
-        res.send('step3')
-        return false
-      }
+// async function updateOneCompanyPic(req, res) {
+//   if (authPreValidation(req.signedCookies.session, req.signedCookies.mail)) {
+//     let que1st = `SELECT user_id, logo_url, role FROM "users" WHERE auth_cookie = $1 AND email = $2 AND role = 'company'`
+//     let params1st = [req.signedCookies.session, req.signedCookies.mail]
+//     pool.query(que1st, params1st, (error, results) => {
+//       if (error) {
+//         res.send('step2')
+//         console.log('updateOneCompanyPic Error: ', error)
+//         return false
+//       }
+//       if (results.rows.length != 1 || results.rows[0].role != 'company') {
+//         res.send('step3')
+//         return false
+//       }
 
-      let uid = results.rows[0].user_id
+//       let uid = results.rows[0].user_id
       
-      let logo_url = ''
-      //VALIDATE SHIET HERE!
-      if (req.body.logo_url && req.body.logo_url.length < 86) {
-        logo_url = req.body.logo_url
-      } else logo_url = results.rows[0].logo_url
+//       let logo_url = ''
+//       //VALIDATE SHIET HERE!
+//       if (req.body.logo_url && req.body.logo_url.length < 86) {
+//         logo_url = req.body.logo_url
+//       } else logo_url = results.rows[0].logo_url
 
-      let que2nd = `
-        UPDATE "users"
-        SET "logo_url" = $1
-        WHERE user_id = $2
-      `
-      let params2nd = [logo_url, uid]
+//       let que2nd = `
+//         UPDATE "users"
+//         SET "logo_url" = $1
+//         WHERE user_id = $2
+//       `
+//       let params2nd = [logo_url, uid]
 
-      pool.query(que2nd, params2nd, (error2, results2) => {
-        if (error2) {
-          console.log('updateOneCompanyPic, err2: ', error2)
-          res.send('error')
-          return false
-        }
-        res.send('OK')
-      })
+//       pool.query(que2nd, params2nd, (error2, results2) => {
+//         if (error2) {
+//           console.log('updateOneCompanyPic, err2: ', error2)
+//           res.send('error')
+//           return false
+//         }
+//         res.send('OK')
+//       })
 
 
-    })
-  } else res.send('auth error')
-}
+//     })
+//   } else res.send('auth error')
+// }
 
 async function getOwnCompanyJSON(req, res) {
   if (authPreValidation(req.signedCookies.session, req.signedCookies.mail)) {
@@ -4509,6 +4512,12 @@ async function cvurlupdate(req, res) {
     } else res.send('err2')
   } else res.send('err1')
 }
+
+async function cvUpdateX(req, res) {
+
+}
+//make delete too!!!
+
 
 async function getCVHitsHistory(req, res) {
   if (authPreValidation(req.signedCookies.session, req.signedCookies.mail)) {
@@ -5290,6 +5299,7 @@ module.exports = {
 
   getCVHitsHistory,
   cvurlupdate,
+  cvUpdateX,
   cvurldelete,
   changeuserstuff,
   changepw,
@@ -5298,7 +5308,7 @@ module.exports = {
 
   getOwnJobs,
   getOwnCompanyJSON,
-  updateOneCompanyPic,
+  // updateOneCompanyPic,
   updateOneCompanyPicX,
   updateOneCompany,
 
@@ -6194,7 +6204,7 @@ async function adminJobs(req, res) {
                 : `<button id="btn_apr_${val.job_id}" style="padding:0" onclick="sendaprjob(${val.job_id})">Одобрить</button>`
               }
               <a href="/statics/sn_posted/${val.job_id}.png?rand=${Date.now()}" download style="margin: 0 5px;">соцпик</a>
-              <button title="Перегенерировать картинку" onclick='sendPicRegen(event, "${val.title}","${val.salary_min}", "${val.salary_max}", "${val.currency}","${val.city}", "${val.job_id}")'>🔄</button>
+              <button title="Перегенерировать картинку" onclick='sendPicRegen(event, "${val.title}","${val.salary_min}", "${val.salary_max}", "${val.currency}","${val.city}", "${val.job_id}", "${val.contact_tel}")'>🔄</button>
               <button title="Отредактировать название и описание" onclick='showEditModal(event, ${val.job_id}, "${val.title}", \`${val.description}\`)'>✍</button>
             </td>
           </tr>
@@ -6285,9 +6295,9 @@ async function adminJobs(req, res) {
             })
           }
           document.getElementById("title-filter-inp").addEventListener('input', filterInput)
-          function sendPicRegen(event, title, sal_min, sal_max, cur, city, jid) {
+          function sendPicRegen(event, title, sal_min, sal_max, cur, city, jid, contact_tel) {
             // if (sal.startsWith('0 - 0')) sal = 'По итогам собеседования'
-            let d = {title, sal_min, sal_max, cur, city, jid}
+            let d = {title, sal_min, sal_max, cur, city, contact_tel, jid}
             var http = new XMLHttpRequest()
             var url = '/socpicbyparams.json'
             http.open('POST', url, true)
@@ -6788,7 +6798,7 @@ async function approveJobByIdAdmin(req, res) {
       //если есть в базе и автор сам удаляющий
       //удалить
       
-      let que2nd = `UPDATE jobs SET (is_published, time_updated, closed_why) = (TRUE, NOW(), '') WHERE job_id = $1 RETURNING title, salary_min, salary_max, city, currency`
+      let que2nd = `UPDATE jobs SET (is_published, time_updated, closed_why) = (TRUE, NOW(), '') WHERE job_id = $1 RETURNING title, salary_min, salary_max, city, currency, contact_tel`
       let params2nd = [jid]
       pool.query(que2nd, params2nd, (error2, results2) => {
         if (error2) {
