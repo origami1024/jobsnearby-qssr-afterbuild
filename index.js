@@ -3060,7 +3060,8 @@ module.exports.extendApp = function ({ app, ssr }) {
       //empty or not valid auth data
       req.userData = 'noauth'
     }
-    req.rawjobs = await db.getJobsUserStatsSSR().catch(error => {
+    let page_num = (req.query && req.query.page) ? req.query.page : 1
+    req.rawjobs = await db.getJobsUserStatsSSR(page_num).catch(error => {
       console.log('getJobsUserStatsSSR. xxx', error)
       return undefined
     })
@@ -5321,12 +5322,20 @@ async function getJobDataSSR(id, addr) {
   return(job)
 }
 
-async function getJobsUserStatsSSR() {
+async function getJobsUserStatsSSR(page_num) {
   //get JOBS and USERSTATS in one
+  let page = 1
+  if (page_num && Number(page_num) > 0 && Number(page_num) < 15)
+    page = page_num
+  
   let perpage = '25'
+
+  let offset = (page - 1) * Number(perpage)
+  
   let sort = 'ORDER BY (jobs.time_updated, jobs.job_id) DESC'
-  let que =  `SELECT jobs.author_id, users.company as author, jobs.job_id, jobs.city, jobs.experience, jobs.title, jobs.currency, jobs.salary_min, jobs.salary_max, jobs.description, jobs.time_updated as updated, jobs.contact_mail, contact_tel FROM jobs, users WHERE jobs.author_id = users.user_id AND jobs.is_published = TRUE AND jobs.is_closed = FALSE AND jobs.time_updated > NOW() - interval '1 month' ${sort} LIMIT $1`
+  let que =  `SELECT jobs.author_id, users.company as author, jobs.job_id, jobs.city, jobs.experience, jobs.title, jobs.currency, jobs.salary_min, jobs.salary_max, jobs.description, jobs.time_updated as updated, jobs.contact_mail, contact_tel FROM jobs, users WHERE jobs.author_id = users.user_id AND jobs.is_published = TRUE AND jobs.is_closed = FALSE AND jobs.time_updated > NOW() - interval '1 month' ${sort} LIMIT $1 OFFSET ${offset}`
   let qparams = [perpage]
+  console.log(que)
 
   let r1 = await pool.query(que, qparams).catch(error => {
     console.log('getJobsForSSR 1. ', error)
@@ -5348,7 +5357,7 @@ async function getJobsUserStatsSSR() {
     console.log('getJobsForSSR 3. ', error)
     return 'erra3'
   })
-  return {...r2.rows[0], 'page': 1, 'perpage': perpage, rows: r1.rows, stats: r3.rows}
+  return {...r2.rows[0], 'page': page, 'perpage': perpage, rows: r1.rows, stats: r3.rows}
   
 }
 
