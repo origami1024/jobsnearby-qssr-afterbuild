@@ -6056,7 +6056,7 @@ async function adminGetUsers() {
   let que = `
     SELECT *
     FROM "users"
-    ORDER BY time_updated DESC
+    ORDER BY time_created DESC
   `
   let result = await pool.query(que, null).catch(error => {
     console.log('cp adminGetUsers err1: ', error)
