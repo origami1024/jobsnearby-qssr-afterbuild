@@ -3216,7 +3216,7 @@ const pool = new Pool({
 // console.log('debug2', process.env.SITE_URL)
 // console.log('debug3', process.env.GMAIL_FOR_VERIFICATIONS)
 // console.log('debug4', process.env.GMAIL_PW)
-const titleRegex = /^[\wа-яА-ЯÇçÄä£ſÑñňÖö$¢Üü¥ÿýŽžŞş\s\-\+\$\%\(\)\№\:\#\/]*$/
+const titleRegex = /^[\wа-яА-ЯÇçÄä£ſÑñňÖö$¢Üü¥ÿýŽžŞş\s\-\.\,\+\$\%\(\)\№\:\#\/\"]*$/
 
 const bcrypt = __webpack_require__(15)
 
@@ -3226,7 +3226,7 @@ const fs = __webpack_require__(3)
 const { SSL_OP_CRYPTOPRO_TLSEXT_BUG } = __webpack_require__(36)
 
 const DAILY_JOBS_LIMIT = 30 //Макс кол-во вакансий в день(86400 сек, что указано ниже)
-const JOBS_LIMIT_DURATION = 86400 //86400 - 24 hours
+// const JOBS_LIMIT_DURATIO1 = 86400 //86400 - 24 hours
 
 const SupremeValidator = __webpack_require__(9).SupremeValidator
 
@@ -3491,12 +3491,12 @@ async function forgottenMail(url, mail) {
         pass: process.env.GMAIL_PW || 'g789451bb'
     }
   })
-  console.log('sending letter')
+  console.log('sending ащкпщееут mail')
   let baseUrl = process.env.SITE_URL || 'http://127.0.0.1:7777'
   let url1 = baseUrl + '/forgottenx2.json?n=' + url
   let mailOptions = {
     // should be replaced with real recipient's account
-    to: mail, //'origami1024@gmail.com',
+    to: mail,
     subject: 'Восстановление пароля на hunarmen.com',
     text: 'Для получения нового пароля нужно подтвердить восстановление, перейдя по ссылке ' + url1 + '. После этого вы получите второе письмо с новым паролем. Эта ссылка действительна в течении 2 часов.'
   }
@@ -3741,13 +3741,13 @@ async function addJobs (req, res) {
       console.log('moderator action - no limits')
     }
 
-    if (limitCount >= DAILY_JOBS_LIMIT && parseInt(last_posted) != NaN && parseInt(last_posted) < 0 && parseInt(last_posted) > -JOBS_LIMIT_DURATION) {//-86400
+    if (limitCount >= DAILY_JOBS_LIMIT) {//-86400
       res.send({msg: 'error limits reached', added: 0, total: req.body.length})
       return false
     }
-    if (parseInt(last_posted) < -JOBS_LIMIT_DURATION) {
-      limitCount = 0
-    }
+    // if (parseInt(last_posted) < -JOBS_LIMIT_DURATIO1) {
+    //   limitCount = 0
+    // }
     if (DAILY_JOBS_LIMIT - limitCount < processedlength) processedlength = DAILY_JOBS_LIMIT - limitCount
 
     
@@ -3782,10 +3782,10 @@ async function addJobs (req, res) {
     
     let que3rd = `UPDATE "users" SET "new_jobs_count_today" = $1 WHERE user_id = $2`
     let params3rd = [limitCount + processedlength, uid]
-    if (last_posted == null || parseInt(last_posted) == NaN || parseInt(last_posted) < -JOBS_LIMIT_DURATION) {
-      que3rd = `UPDATE "users" SET ("new_jobs_count_today", "new_jobs_count_date") = ($2, NOW()) WHERE user_id = $1`
-      params3rd = [uid, processedlength]
-    }
+    // if (last_posted == null || parseInt(last_posted) == NaN || parseInt(last_posted) < -JOBS_LIMIT_DURATIO1) {
+    //   que3rd = `UPDATE "users" SET ("new_jobs_count_today") = ($2) WHERE user_id = $1`
+    //   params3rd = [uid, processedlength]
+    // }
     pool.query(que3rd, params3rd, (error3, results3) => {
       if (error3) {
         res.send('step4')
@@ -4099,7 +4099,7 @@ async function addOneJob (req, res) {
       if (!limitCount) limitCount = 0
       // console.log('cp67', last_posted)
       // console.log('cp68', limitCount)
-      if (limitCount >= DAILY_JOBS_LIMIT && parseInt(last_posted) != NaN && parseInt(last_posted) < 0 && parseInt(last_posted) > -JOBS_LIMIT_DURATION) {//-86400
+      if (limitCount >= DAILY_JOBS_LIMIT) {//-86400
         res.send('error limits reached')
         return false
       }
@@ -4126,12 +4126,6 @@ async function addOneJob (req, res) {
         if (results2.rows.length > 0) {
           let que3rd = `UPDATE "users" SET "new_jobs_count_today" = $1 WHERE user_id = $2`
           let params3rd = [limitCount + 1, uid]
-          if (last_posted == null || parseInt(last_posted) == NaN || parseInt(last_posted) < -JOBS_LIMIT_DURATION) {
-            //if last_posted(first_posted) if converted from null or 
-            que3rd = `UPDATE "users" SET ("new_jobs_count_today", "new_jobs_count_date") = ('1', NOW()) WHERE user_id = $1`
-            params3rd = [uid]
-          }
-          
           
           pool.query(que3rd, params3rd, (error3, results3) => {
             if (error3) {
@@ -7015,9 +7009,10 @@ async function forceEdit(req, res) {
         res.send(JSON.stringify({"success": "false", "msg": "title не прошел валидацию"}))
         return false
       }
-      if (data.desc && data.desc.length > 1 && data.desc.length < 2001) {
+      if (data.desc && data.desc.length >= 0) {
         parsedData.description = data.desc
-      } else {
+      } else parsedData.description = ''
+      if (data.desc.length > 2000) {
         res.send(JSON.stringify({"success": "false", "msg": "Макс длина description 2000"}))
         return false
       }
