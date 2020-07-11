@@ -5055,6 +5055,22 @@ async function tryInsertMailVerification(hash1, userId, mail) {
   } return undefined
 }
 
+async function tryInsertMailVerificationNoMail(hash1, userId, mail) {
+  let que = `
+    UPDATE "users" SET (is_active, email_confirmed, block_reason) = (TRUE, TRUE, '') 
+    WHERE user_id = $1
+    `
+  let params = [userId]
+  let result = await pool.query(que, params).catch(error => {
+    console.log(error)
+    throw new Error('veri insertion failed')
+  })
+  if (result) {
+    return true
+  } return undefined
+}
+
+
 async function reg(req, res) {
   console.log('cp register', req.body)
   //first server-side literal validation
@@ -5121,13 +5137,24 @@ async function reg(req, res) {
     
     let hash1 = String(hashSome()) + userId + parseInt(Math.random()*1000000000, 10)
 
-    let success1 = await tryInsertMailVerification(hash1, userId, mail).catch(error => {
-      res.send('step5')
-      return undefined
-    })
+    //currently sending mail on registration depends on usertype(role)
+    let success1
+    if (usertype === 'subscriber') {
+      success1 = await tryInsertMailVerificationNoMail(hash1, userId, mail).catch(error => {
+        res.send('step5')
+        return undefined
+      })
+    } else {
+      success1 = await tryInsertMailVerification(hash1, userId, mail).catch(error => {
+        res.send('step5')
+        return undefined
+      })
+    }
     if (success1) {
-      testMail(hash1, mail)
-      console.log('it is successful registraion at this point')
+      if (usertype !== 'subscriber') {
+        testMail(hash1, mail)
+      }
+      //testMail(hash1, mail) - turn it back on for sending mails
       res.send('OK')
     } else {res.send('step6'); console.log('failed at creating the verification entry')}
     
