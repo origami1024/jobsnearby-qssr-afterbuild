@@ -4532,9 +4532,9 @@ async function cvUpdateX(req, res) {
       let uid = results.rows[0].user_id
       let cv = req.file
       // console.log('cp315', cv)
-      if (cv.size < 309601) {
+      if (cv.size < 409601) {
         let ext = cv.originalname.split('.').pop()
-        console.log('cp318', req.headers.host)
+        
         let path_part1 = req.headers.host + '/uploads/cvs/' + uid
         fs.unlink(path_part1 + '.doc', (err) => {})
         fs.unlink(path_part1 + '.docx', (err) => {})
@@ -7012,7 +7012,7 @@ async function approveJobByIdAdmin(req, res) {
 
 async function forceEdit(req, res) {
   console.log('forceEdit cp, maybe error around. 03-Jul-2020')
-  const titleRegex = /^[\wа-яА-ЯÇçÄä£ſÑñňÖö$¢Üü¥ÿýŽžŞş\s\-\+\$\%\(\)\№\:\#\/]*$/
+  const titleRegex = /^[\wа-яА-ЯÇçÄä£ſÑñňÖö$¢Üü¥ÿýŽžŞş\s\-\.\,\+\$\%\(\)\№\:\#\/\"]*$/
   if (req.cookies.sessioa && req.cookies.sessioa.length > 50 && req.cookies.user2) {
     let que1st = `SELECT u2id FROM "users2" WHERE "u2coo" = $1 AND "u2mail" = $2`
     let params1st = [req.cookies.sessioa, req.cookies.user2]
