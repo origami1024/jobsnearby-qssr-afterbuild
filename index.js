@@ -2862,7 +2862,10 @@ module.exports.renderToString = function ({ req, res }, cb) {
     res
   }
 
-  renderer.renderToString(ctx, cb)
+  renderer.renderToString(ctx, (err, html) => {
+    if (err) { cb(err, html) }
+    else { cb(err, ctx.$getMetaHTML(html, ctx)) }
+  })
 
 }
 
