@@ -360,6 +360,69 @@ module.exports = require("path");
 /* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
+const jwt = __webpack_require__(37)
+
+const SupremeValidator = {
+  isValidEmail(email) {
+    if (email.length < 6 || email.length > 50) return false
+    return /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/.test(email)
+  },
+  isValidPW(pw) {
+    let pwRegex = /[a-zA-Z]/
+    if (pw.length < 6 || pw.length > 25) return false
+    return (pw && pw.length > 5 && pw.length < 26 && pwRegex.test(pw))
+  },
+  generateJSONWebToken(mail){
+    const signature = 'YoiRG3rots' + Math.random()
+    return jwt.sign({ mail }, signature, { expiresIn: '6h' }).substr(0, 165)
+  }
+}
+
+
+function salaryDeriv (salary_min, salary_max, currency) {
+  // let currency = $t('App.currencyDic')[this.job.currency]
+  console.log('cp exx1', salary_min, salary_max, currency)
+  let res = ''
+  if (salary_min < 1) {
+    if (salary_max < 1) {
+      res = 'По итогам собеседования'
+      // res = $t('jobPage.salaryNone')
+    } else res = salary_max + ' ' + currency
+  } else {
+    if (salary_min < salary_max) {
+      res = `${salary_min} - ${salary_max}` + ' ' + currency
+    } else
+    if (salary_min == salary_max) {
+      res = `${salary_max}` + ' ' + currency
+    } else res = `${salary_max}` + ' ' + currency
+  }
+  return res
+}
+function expDeriv (exp_value) {
+  let exp
+      (1 > exp_value && exp_value>= 0) ?
+        exp = '\n' + 'Без опыта.'
+      :(exp_value >= 1 && 3 > exp_value) ?
+        exp = '\n' + 'Опыт: от 1 до 3 лет.'
+      :(exp_value >= 3 && 5 > exp_value) ?
+        exp = '\n' + 'Опыт: от 3 до 5 лет.'
+      :exp_value >= 5 ?
+        exp = '\n' + 'Опыт: от 5 лет.'
+      : exp = ''
+      return exp
+}
+
+module.exports = {
+  SupremeValidator,
+  salaryDeriv,
+  expDeriv
+}
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
 "use strict";
 /*!
  * http-errors
@@ -630,7 +693,7 @@ function populateConstructorExports (exports, codes, HttpError) {
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -646,7 +709,7 @@ if (typeof process !== 'undefined' && process.type === 'renderer') {
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -663,7 +726,7 @@ if (typeof process !== 'undefined' && process.type === 'renderer') {
  * @private
  */
 
-var createError = __webpack_require__(5)
+var createError = __webpack_require__(6)
 var getBody = __webpack_require__(57)
 var iconv = __webpack_require__(19)
 var onFinished = __webpack_require__(77)
@@ -834,7 +897,7 @@ function contentstream (req, debug, inflate) {
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1105,55 +1168,6 @@ function tryNormalizeType (value) {
   }
 }
 
-
-/***/ }),
-/* 9 */
-/***/ (function(module, exports, __webpack_require__) {
-
-
-const jwt = __webpack_require__(37)
-
-const SupremeValidator = {
-  isValidEmail(email) {
-    if (email.length < 6 || email.length > 50) return false
-    return /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/.test(email)
-  },
-  isValidPW(pw) {
-    let pwRegex = /[a-zA-Z]/
-    if (pw.length < 6 || pw.length > 25) return false
-    return (pw && pw.length > 5 && pw.length < 26 && pwRegex.test(pw))
-  },
-  generateJSONWebToken(mail){
-    const signature = 'YoiRG3rots' + Math.random()
-    return jwt.sign({ mail }, signature, { expiresIn: '6h' }).substr(0, 165)
-  }
-}
-
-
-function salaryDeriv (salary_min, salary_max, currency) {
-  // let currency = $t('App.currencyDic')[this.job.currency]
-  console.log('cp exx1', salary_min, salary_max, currency)
-  let res = ''
-  if (salary_min < 1) {
-    if (salary_max < 1) {
-      res = 'По итогам собеседования'
-      // res = $t('jobPage.salaryNone')
-    } else res = salary_max + ' ' + currency
-  } else {
-    if (salary_min < salary_max) {
-      res = `${salary_min} - ${salary_max}` + ' ' + currency
-    } else
-    if (salary_min == salary_max) {
-      res = `${salary_max}` + ' ' + currency
-    } else res = `${salary_max}` + ' ' + currency
-  }
-  return res
-}
-
-module.exports = {
-  SupremeValidator,
-  salaryDeriv
-}
 
 /***/ }),
 /* 10 */
@@ -3217,7 +3231,7 @@ const { SSL_OP_CRYPTOPRO_TLSEXT_BUG } = __webpack_require__(36)
 const DAILY_JOBS_LIMIT = 30 //Макс кол-во вакансий в день(86400 сек, что указано ниже)
 // const JOBS_LIMIT_DURATIO1 = 86400 //86400 - 24 hours
 
-const SupremeValidator = __webpack_require__(9).SupremeValidator
+const SupremeValidator = __webpack_require__(5).SupremeValidator
 
 const cookieConfig = {
   httpOnly: true, // to disable accessing cookie via client side js
@@ -3228,7 +3242,8 @@ const cookieConfig = {
 const cookieConfigNoRemember = {
   httpOnly: true, // to disable accessing cookie via client side js
   // secure: true, // to force https (if you use it)
-  signed: true // if you use the secret with cookieParser
+  signed: true, // if you use the secret with cookieParser
+  sameSite: true
 }
 
 function authPreValidation(session, mail) {
@@ -5470,9 +5485,10 @@ const path = __webpack_require__(4)
 const fs = __webpack_require__(3)
 
 // let nodeMailer = require('nodemailer')
-const SupremeValidator = __webpack_require__(9).SupremeValidator
+const SupremeValidator = __webpack_require__(5).SupremeValidator
 const pageParts = __webpack_require__(40)
-const salaryDeriv = __webpack_require__(9).salaryDeriv
+const salaryDeriv = __webpack_require__(5).salaryDeriv
+const expDeriv = __webpack_require__(5).expDeriv
 //Добавить лог
 async function addLog (action, body, author_id, author_mail) {
   //time, action, body, author_id, author_name
@@ -5705,6 +5721,9 @@ async function adminPanel(req, res) {
             }
             .cpul1 li a:hover {
               color: blue;
+            }
+            .cp_logs table tbody tr:nth-child(even) {
+              background-color: #eee5;
             }
           </style>
             <ul class="cpul1" style="list-style-type: none; width: 65%">
@@ -6962,7 +6981,7 @@ async function approveJobByIdAdmin(req, res) {
       //если есть в базе и автор сам удаляющий
       //удалить
       
-      let que2nd = `UPDATE jobs SET (is_published, time_updated, closed_why) = (TRUE, NOW(), '') WHERE job_id = $1 RETURNING title, salary_min, salary_max, city, currency, contact_tel`
+      let que2nd = `UPDATE jobs SET (is_published, time_updated, closed_why) = (TRUE, NOW(), '') WHERE job_id = $1 RETURNING title, salary_min, salary_max, city, currency, contact_tel, experience`
       let params2nd = [jid]
       pool.query(que2nd, params2nd, (error2, results2) => {
         if (error2) {
@@ -6981,13 +7000,16 @@ async function approveJobByIdAdmin(req, res) {
         // let sal = results2.rows[0].salary_min + ' - ' + results2.rows[0].salary_max + results2.rows[0].currency
         // if (sal.startsWith('0 - 0')) sal = 'По итогам собеседования'
         let sal = salaryDeriv(results2.rows[0].salary_min, results2.rows[0].salary_max, results2.rows[0].currency)
+        let exp = expDeriv(results2.rows[0].experience)
         const python = spawn('python', [
           'sn_bot.py',
           results2.rows[0].title,
           sal,
           results2.rows[0].city,
           results2.rows[0].contact_tel,
-          jid])
+          jid,
+          exp
+        ])
         // console.log('cp21', process.cwd())
         // console.log('cp22', results2.rows[0])
         //
@@ -7751,10 +7773,10 @@ function eventListenerCount (emitter, type) {
 
 var bytes = __webpack_require__(1)
 var contentType = __webpack_require__(11)
-var createError = __webpack_require__(5)
-var debug = __webpack_require__(6)('body-parser:json')
-var read = __webpack_require__(7)
-var typeis = __webpack_require__(8)
+var createError = __webpack_require__(6)
+var debug = __webpack_require__(7)('body-parser:json')
+var read = __webpack_require__(8)
+var typeis = __webpack_require__(9)
 
 /**
  * Module exports.
@@ -8830,7 +8852,7 @@ module.exports = require("net");
  */
 
 var bytes = __webpack_require__(1)
-var createError = __webpack_require__(5)
+var createError = __webpack_require__(6)
 var iconv = __webpack_require__(19)
 var unpipe = __webpack_require__(76)
 
@@ -12616,9 +12638,9 @@ module.exports = JSON.parse("{\"application/1d-interleaved-parityfec\":{\"source
  */
 
 var bytes = __webpack_require__(1)
-var debug = __webpack_require__(6)('body-parser:raw')
-var read = __webpack_require__(7)
-var typeis = __webpack_require__(8)
+var debug = __webpack_require__(7)('body-parser:raw')
+var read = __webpack_require__(8)
+var typeis = __webpack_require__(9)
 
 /**
  * Module exports.
@@ -12725,9 +12747,9 @@ function typeChecker (type) {
 
 var bytes = __webpack_require__(1)
 var contentType = __webpack_require__(11)
-var debug = __webpack_require__(6)('body-parser:text')
-var read = __webpack_require__(7)
-var typeis = __webpack_require__(8)
+var debug = __webpack_require__(7)('body-parser:text')
+var read = __webpack_require__(8)
+var typeis = __webpack_require__(9)
 
 /**
  * Module exports.
@@ -12855,11 +12877,11 @@ function typeChecker (type) {
 
 var bytes = __webpack_require__(1)
 var contentType = __webpack_require__(11)
-var createError = __webpack_require__(5)
-var debug = __webpack_require__(6)('body-parser:urlencoded')
+var createError = __webpack_require__(6)
+var debug = __webpack_require__(7)('body-parser:urlencoded')
 var deprecate = __webpack_require__(10)('body-parser')
-var read = __webpack_require__(7)
-var typeis = __webpack_require__(8)
+var read = __webpack_require__(8)
+var typeis = __webpack_require__(9)
 
 /**
  * Module exports.
