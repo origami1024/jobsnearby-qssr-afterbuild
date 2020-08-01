@@ -3071,7 +3071,7 @@ module.exports.extendApp = function ({ app, ssr }) {
     next()
   })
   //2
-  app.get('/jobpage', async function (req, res, next) {
+  app.get('/jobpage/:jid', async function (req, res, next) {
     //auth first
     if (db.authPreValidation(req.signedCookies.session, req.signedCookies.mail)) {
       req.userData = await db.getUserAuthByCookies(req.signedCookies.session, req.signedCookies.mail).catch(error => {
@@ -3084,7 +3084,9 @@ module.exports.extendApp = function ({ app, ssr }) {
     }
 
     //second this
-    const id = parseInt(req.query.id)
+    // const id = parseInt(req.query.id)
+    const id = parseInt(req.params.jid)
+
     if (isNaN(id) || id < 0 || String(id).length > 10) {
       console.log('Error: wrong id')
       res.status(400).send('Неправильный id вакансии.')
@@ -3099,7 +3101,7 @@ module.exports.extendApp = function ({ app, ssr }) {
     next()
   })
   //3
-  app.get('/companypage', async function (req, res, next) {
+  app.get('/companypage/:cid', async function (req, res, next) {
     //auth first
     if (db.authPreValidation(req.signedCookies.session, req.signedCookies.mail)) {
       req.userData = await db.getUserAuthByCookies(req.signedCookies.session, req.signedCookies.mail).catch(error => {
@@ -3112,7 +3114,7 @@ module.exports.extendApp = function ({ app, ssr }) {
     }
 
     //second this
-    const id = parseInt(req.query.id)
+    const id = parseInt(req.params.cid)
     if (isNaN(id) || id < 0 || String(id).length > 10) {
       console.log('Error: wrong company id')
       res.status(400).send('Неправильный id компании.')
