@@ -3046,8 +3046,14 @@ module.exports.extendApp = function ({ app, ssr }) {
   
   // aa end
   
-
-
+  app.get('/jobpage', async function (req, res, next) {
+    res.set('location', '/jobpage/' + req.query.id);
+    res.status(301).send()
+  })
+  app.get('/companypage', async function (req, res, next) {
+    res.set('location', '/companypage/' + req.query.id);
+    res.status(301).send()
+  })
 
   //ssr stuff
   //1
@@ -3063,6 +3069,7 @@ module.exports.extendApp = function ({ app, ssr }) {
       //empty or not valid auth data
       req.userData = 'noauth'
     }
+    //let page_num = (req.query && req.query.page) ? req.query.page : 1
     let page_num = (req.query && req.query.page) ? req.query.page : 1
     req.rawjobs = await db.getJobsUserStatsSSR(page_num).catch(error => {
       console.log('getJobsUserStatsSSR. xxx', error)
@@ -6357,8 +6364,8 @@ async function adminJobs(req, res) {
         let tmp = `
           <tr id="jtr_${val.job_id}" ${(val.is_published == false && val.is_closed == false) ? 'style="font-weight: 700"' : ''}>
             <td>${val.job_id}</td>
-            <td><a href="/jobpage?id=${val.job_id}" target="_blank">${val.title}</a></td>
-            <td><a href="/companypage?id=${val.author_id}" target="_blank">${val.author_id}</a></td>
+            <td><a href="/jobpage/${val.job_id}" target="_blank">${val.title}</a></td>
+            <td><a href="/companypage/${val.author_id}" target="_blank">${val.author_id}</a></td>
             <td>${d}</td>
             <td id="td_apr_${val.job_id}">${val.is_published}</td>
             <td>${val.contact_mail}</td>
