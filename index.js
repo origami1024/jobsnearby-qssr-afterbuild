@@ -3353,7 +3353,7 @@ function validateOneJob (data) {
   else if (data.jtype && data.jtype == 'v') parsedData.jobtype = 'v'
   else parsedData.jobtype = ''
   //description - необязат, от 2х символов до 500
-  if (data.description && data.description.length > 1 && data.description.length < 2001) {
+  if (data.description && data.description.length > 1 && data.description.length < 3001) {
     parsedData.description = data.description
   } else parsedData.description = ''
   //"contact_tel", "contact_mail", 
@@ -3366,6 +3366,11 @@ function validateOneJob (data) {
   if (data.contact_mail && data.contact_mail.length < 41 && /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/.test(data.contact_mail)) {
     parsedData.contact_mail = data.contact_mail
   } else parsedData.contact_mail = ''
+
+  //contact_amil or contact_tel must be present!
+  if (parsedData.contact_tel.length == 0 && parsedData.contact_mail.length == 0) {
+    return false
+  }
 
   return parsedData
 }
@@ -7059,8 +7064,8 @@ async function forceEdit(req, res) {
       if (data.desc && data.desc.length >= 0) {
         parsedData.description = data.desc
       } else parsedData.description = ''
-      if (data.desc.length > 2000) {
-        res.send(JSON.stringify({"success": "false", "msg": "Макс длина description 2000"}))
+      if (data.desc.length > 3000) {
+        res.send(JSON.stringify({"success": "false", "msg": "Макс длина description 3000"}))
         return false
       }
       if (data.jcategory != undefined && isNaN(data.jcategory) === false && data.jcategory >= 0 && data.jcategory < 20) {
