@@ -4100,7 +4100,7 @@ async function addOneJob (req, res) {
   // console.log('cp177', req.signedCookies)
   // console.log('cp178', req.signedCookies)
   if (authPreValidation(req.signedCookies.session, req.signedCookies.mail)) {
-    let que1st = `SELECT user_id, email, new_jobs_count_today, EXTRACT(EPOCH FROM new_jobs_count_date - 'now()'::timestamptz) AS last_posted FROM "users" WHERE auth_cookie = $1 AND email = $2 AND role = 'company'`
+    let que1st = `SELECT user_id, email, new_jobs_count_today FROM "users" WHERE auth_cookie = $1 AND email = $2 AND role = 'company'`
     let params1st = [req.signedCookies.session, req.signedCookies.mail]
     pool.query(que1st, params1st, (error, results) => {
       if (error) {
@@ -4112,7 +4112,6 @@ async function addOneJob (req, res) {
         return false
       }
       let uid = results.rows[0].user_id
-      let last_posted = results.rows[0].last_posted
       let limitCount = parseInt(results.rows[0].new_jobs_count_today)
       if (!limitCount) limitCount = 0
       // console.log('cp67', last_posted)
