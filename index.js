@@ -3018,6 +3018,11 @@ module.exports.extendApp = function ({ app, ssr }) {
   app.get('/resend.json', db.resend)
   app.post('/resender.json', db.resender)
 
+  app.post('/cv', db.cvCreateUpdate)
+  app.delete('/cv', db.cvDelete)
+  app.get('/cv', db.cvFetchForEdit)
+  app.get('/cv/:id', db.cvGetDetail)
+  app.get('/cv-index', db.cvGetIndex)
 
   //CPSTART
   app.get('/cp.json', adm.adminPanel)
@@ -3178,6 +3183,49 @@ module.exports.extendApp = function ({ app, ssr }) {
     if (db.authPreValidation(req.signedCookies.session, req.signedCookies.mail)) {
       req.userData = await db.getUserAuthByCookies(req.signedCookies.session, req.signedCookies.mail).catch(error => {
         console.log('getUserAuthByCookies. addjob', error)
+        return 'error1'
+      })
+    } else {
+      //empty or not valid auth data
+      req.userData = 'noauth'
+    }
+    next()
+  })
+  app.get('/cv-editor', async function (req, res, next) {
+    //only auth here
+    if (db.authPreValidation(req.signedCookies.session, req.signedCookies.mail)) {
+      req.userData = await db.getUserAuthByCookies(req.signedCookies.session, req.signedCookies.mail).catch(error => {
+        console.log('getUserAuthByCookies. addCV', error)
+        return 'error1'
+      })
+      // req.cvData = await db.cvFetchForEditSSR(req, res).catch(error => {
+      //   console.log('cvFetchForEdit. addCV', error)
+      //   return 'error2'
+      // })
+    } else {
+      //empty or not valid auth data
+      req.userData = 'noauth'
+    }
+    next()
+  })
+  app.get('/cvs/:id', async function (req, res, next) {
+    //only auth here
+    if (db.authPreValidation(req.signedCookies.session, req.signedCookies.mail)) {
+      req.userData = await db.getUserAuthByCookies(req.signedCookies.session, req.signedCookies.mail).catch(error => {
+        console.log('getUserAuthByCookies. addCV', error)
+        return 'error1'
+      })
+    } else {
+      //empty or not valid auth data
+      req.userData = 'noauth'
+    }
+    next()
+  })
+  app.get('/cv-list', async function (req, res, next) {
+    //only auth here
+    if (db.authPreValidation(req.signedCookies.session, req.signedCookies.mail)) {
+      req.userData = await db.getUserAuthByCookies(req.signedCookies.session, req.signedCookies.mail).catch(error => {
+        console.log('getUserAuthByCookies. addCV', error)
         return 'error1'
       })
     } else {
@@ -4164,6 +4212,497 @@ async function addOneJob (req, res) {
     })
 
   } else {res.send('auth fail')}
+}
+
+async function cvGetDetail(req, res) {
+  const id = parseInt(req.params.id)
+  if (isNaN(id) || id < 0 || String(id).length > 10) {
+    res.status(400).send('Неправильный id')
+    return false
+  }
+  if (authPreValidation(req.signedCookies.session, req.signedCookies.mail)) {
+    const que1st = `SELECT user_id, email FROM "users" WHERE auth_cookie = $1 AND email = $2 AND role = 'company' AND rights = 'bauss'`
+    const params1st = [req.signedCookies.session, req.signedCookies.mail]
+
+    pool.query(que1st, params1st, (error, results) => {
+      if (error) {
+        res.send('step2')
+        return false
+      }
+      if (!results.rows) {
+        res.send('step3-1')
+        return false
+      } else if (results.rows.length != 1) {
+        res.send('step3-2: ' + results.rows.length)
+        return false
+      }
+
+      console.log('cxzxcz', id)
+      const que2 = `SELECT * FROM "cvs" WHERE id = $1`
+      const params2 = [ id ]
+      pool.query(que2, params2, (err2, res2) => {
+        if (err2) {
+          res.send('step4. Error')
+          return false
+        }
+        if (!res2.rows.length) {
+          res.send('Error, does not exist')
+          return false
+        }
+        res.send(res2.rows[0])
+      })
+
+    })
+
+  } else {res.send('auth fail')}
+}
+
+async function cvGetIndex(req, res) {
+  if (authPreValidation(req.signedCookies.session, req.signedCookies.mail)) {
+    const que1st = `SELECT user_id, email FROM "users" WHERE auth_cookie = $1 AND email = $2 AND role = 'company' AND rights = 'bauss'`
+    const params1st = [req.signedCookies.session, req.signedCookies.mail]
+
+    pool.query(que1st, params1st, (error, results) => {
+      if (error) {
+        res.send('step2')
+        return false
+      }
+      if (!results.rows) {
+        res.send('step3-1')
+        return false
+      } else if (results.rows.length != 1) {
+        res.send('step3-2: ' + results.rows.length)
+        return false
+      }
+      const que2 = `SELECT * FROM "cvs" LIMIT 100`
+      pool.query(que2, null, (err2, res2) => {
+        if (err2) {
+          res.send('step4. Error')
+          return false
+        }
+        // const que3 = `SELECT COUNT(*) FROM "cvs"`
+        // pool.query(que3, null, (err3, res3) => {
+        //   if (err3) {
+        //     res.send('step5. Error')
+        //     return false
+        //   }
+          
+        //   res.status(200).json({...results2.rows[0], 'page': page, 'perpage': perpage, rows: results.rows})
+        
+        // })
+        res.send(res2.rows)
+      })
+    })
+  } else {res.send('auth fail')}
+}
+// async function cvFetchForEditSSR(req, res) {
+//   if (authPreValidation(req.signedCookies.session, req.signedCookies.mail)) {
+//     const que1st = `SELECT user_id, email, cv_id FROM "users" WHERE auth_cookie = $1 AND email = $2 AND role = 'subscriber'`
+//     const params1st = [req.signedCookies.session, req.signedCookies.mail]
+//     const authCheck = await pool
+//       .query(que1st, params1st)
+//       .catch(err => false)
+//     if (!authCheck || !authCheck.rows || authCheck.rows.length !== 1) return false
+    
+//     const cv_id = authCheck.rows[0].cv_id
+//     if (!cv_id) return false
+
+//     const que2 = `SELECT * FROM "cvs" WHERE id = $1`
+//     const params2 = [cv_id]
+//     const result = await pool
+//       .query(que2, params2)
+//       .catch(err => false)
+//     if (!result || !result.rows || result.rows.length !== 1) return false
+
+//     return result.rows[0]
+//   }
+// }
+
+async function cvFetchForEdit(req, res) {
+  if (authPreValidation(req.signedCookies.session, req.signedCookies.mail)) {
+    const que1st = `SELECT user_id, email, cv_id FROM "users" WHERE auth_cookie = $1 AND email = $2 AND role = 'subscriber'`
+    const params1st = [req.signedCookies.session, req.signedCookies.mail]
+    pool.query(que1st, params1st, (error, results) => {
+      if (error) {
+        res.send('Step 2. Auth error')
+        return false
+      }
+      if (!results.rows) {
+        res.send('step3-1')
+        return false
+      } else if (results.rows.length != 1) {
+        res.send('step3-2: ' + results.rows.length)
+        return false
+      }
+
+      const cv_id = results.rows[0].cv_id
+
+      if (!cv_id) {
+        res.send('step4: cv doesnt exists')
+        return false
+      }
+
+      const que2 = `SELECT * FROM "cvs" WHERE id = $1`
+      const params2 = [cv_id]
+
+      pool.query(que2, params2, (error2, results2) => {
+        if (error2) {
+          res.status(400).send('error22')
+          return false
+        }
+        if (!results2.rows || !results2.rows.length) {
+          res.status(400).send('error23')
+          return false
+        }
+        if (results2.rows.length > 1) {
+          res.status(400).send('error24')
+          return false
+        }
+
+        res.send(results2.rows[0])
+
+      })
+
+    })
+
+  } else res.send('Step 1. Auth fail')
+}
+
+async function cvDelete(req, res) {
+  if (authPreValidation(req.signedCookies.session, req.signedCookies.mail)) {
+    const que1st = `SELECT user_id, email, cv_id FROM "users" WHERE auth_cookie = $1 AND email = $2 AND role = 'subscriber'`
+    const params1st = [req.signedCookies.session, req.signedCookies.mail]
+    pool.query(que1st, params1st, (error, results) => {
+      if (error) {
+        res.send('Step 2. Auth error')
+        return false
+      }
+      if (!results.rows) {
+        res.send('step3-1')
+        return false
+      } else if (results.rows.length != 1) {
+        res.send('step3-2: ' + results.rows.length)
+        return false
+      }
+      const uid = results.rows[0].user_id
+      const cv_id = results.rows[0].cv_id
+      const userEmail = results.rows[0].email
+      if (!cv_id) {
+        res.send('step4: cv already deleted')
+        return false
+      }
+      const que21 = `UPDATE "users" SET cv_id = $1 WHERE user_id = $2`
+      const que22 = `DELETE FROM "cvs" WHERE id = $1;`
+      const params21 = [null, uid]
+      const params22 = [cv_id]
+      pool.query(que21, params21, (error21, results21) => {
+        if (error21) {
+          res.send('Step 5. ' + error21)
+          return false
+        }
+        pool.query(que22, params22, (error22, results22) => {
+          if (error22) {
+            res.send('Step 6. ' + error22)
+            return false
+          }
+          res.send('OK')
+          addLog('Резюме удалено', 'Айди резюме: ' + cv_id, uid, userEmail)
+        })
+      })
+
+    })
+  } else { res.send('Step 1. Auth fail') }
+
+}
+
+async function cvCreateUpdate (req, res) {
+  if (authPreValidation(req.signedCookies.session, req.signedCookies.mail)) {
+    const que1st = `SELECT user_id, email, cv_id FROM "users" WHERE auth_cookie = $1 AND email = $2 AND role = 'subscriber'`
+    // const que1st = `
+    //   SELECT users.user_id, users.email, cvs.id FROM users
+    //   LEFT JOIN cvs ON cvs.user_id=users.user_id
+    //   WHERE users.auth_cookie = $1 AND users.email = $2 AND users.role = 'subscriber'
+    // `
+    const params1st = [req.signedCookies.session, req.signedCookies.mail]
+    pool.query(que1st, params1st, (error, results) => {
+      if (error) {
+        res.send('Step 2. Auth error')
+        return false
+      }
+      if (!results.rows) {
+        res.send('step3-1')
+        return false
+      } else if (results.rows.length != 1) {
+        res.send('step3-2: ' + results.rows.length)
+        return false
+      }
+      const uid = results.rows[0].user_id
+      const cv_id = results.rows[0].cv_id
+      const userEmail = results.rows[0].email
+
+      const parsedData = validateCV(req.body)
+      if (!parsedData) {
+        res.send('error, not passing validation')
+        return false
+      }
+      if (parsedData.error) {
+        res.send('Validation error: ' + parsedData.error)
+        return false
+      }
+      // parsedData.user_id = uid
+      let que2
+      const columns = Object.keys(parsedData)
+      const params2nd = Object.values(parsedData)
+      if (cv_id) {
+        //cv found, update
+        //use uid for smth???,
+        const columnsToRefs = columns.map((column, cidx) => column + '=$' + (cidx + 1))
+        // console.log('THIS DA ALRDY EXISTSING', columnsToRefs.join(','))
+        que2 = `UPDATE "cvs" SET ${columnsToRefs.join(',')} WHERE id=${cv_id}`
+        console.log('YUPDATIONG')
+      } else {
+        //no cv - create new
+        const refs = Object.keys(columns).map(k => '$' + (Number(k)+1)).join(',')
+        que2 = `INSERT INTO "cvs" (${columns.join(',')}) VALUES (${refs}) RETURNING id`
+        console.log('CREATING')
+      }
+
+      pool.query(que2, params2nd, (error2, results2) => {
+        if (error2) {
+          res.send('step4-1, error in db: ' + error2)
+          return false
+        }
+        if (!cv_id) {
+          //cv_id is still null on the user
+          if (results2.rows && results2.rows[0] && results2.rows[0].id) {
+            
+            const que3 = `UPDATE "users" SET cv_id = $1 WHERE user_id = $2`
+            const new_cv_id = results2.rows[0].id
+
+            pool.query(que3, [new_cv_id, uid], (error3, results3) => {
+              if (error3) {
+                console.log('Trouble saving cv_id on user')
+              }
+            })
+            res.send({ result: 'OK', new_cv_id })
+          } else {
+            res.send('step5. Error saving to the user')
+          }
+        } else {
+          res.send({ result: 'OK' })
+        }
+
+        addLog(
+          cv_id ? 'Резюме изменено' : 'Резюме создано',
+          parsedData.name,
+          parsedData.user_id,
+          userEmail
+        )
+      })
+      
+
+    })
+    //also just edit ur own one if exists, so you need to check if it exists every time
+
+  } else {res.send('Step 1. Auth fail')}
+}
+
+function validateCV (data) {
+  try {
+    
+    let parsedData = {}
+    // .photo = .photo
+    //TODO: deal with the photo later
+
+    // name
+    if (!data.name) {
+      parsedData.error = 'name is required'
+    } else if (data.name.length < 2) {
+      parsedData.error = 'name: min length is 2 characters'
+    } else if (data.name.length > 75) {
+      parsedData.error = 'name: max length is 75 characters'
+    } else {
+      parsedData.name = data.name
+    }
+    
+    // surname
+    if (!data.surname) {
+      parsedData.error = 'surname is required'
+    } else if (data.surname.length < 2) {
+      parsedData.error = 'surname: min length is 2 characters'
+    } else if (data.surname.length > 75) {
+      parsedData.error = 'surname: max length is 75 characters'
+    } else {
+      parsedData.surname = data.surname
+    }
+
+    // tel
+    if (!data.tel) {
+      parsedData.error = 'tel is required'
+    } else if (data.tel.length < 6) {
+      parsedData.error = 'tel: min length is 6 characters'
+    } else if (data.tel.length > 20) {
+      parsedData.error = 'tel: max length is 20 characters'
+    } else {
+      parsedData.tel = data.tel
+    }
+
+    // tel_home
+    if (data.tel_home) {
+      if (data.tel_home.length < 6) {
+        parsedData.error = 'tel_home: min length is 6 characters'
+      } else if (data.tel_home.length > 20) {
+        parsedData.error = 'tel_home: max length is 20 characters'
+      } else {
+        parsedData.tel_home = data.tel_home
+      }
+    }
+
+    // email
+    if (data.email) {
+      if (data.email.length < 3 ||
+        !/(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/.test(data.email)
+      ) {
+        parsedData.error = 'email: wrong format'
+      } else {
+        parsedData.email = data.email
+      }
+    }
+
+    //city_current
+    if (data.city_current) {
+      if (data.city_current.length < 2) {
+        parsedData.error = 'city_current: min length is 2 characters'
+      } else if (data.city_current.length > 70) {
+        parsedData.error = 'city_current: max length is 70 characters'
+      } else {
+        parsedData.city_current = data.city_current
+      }
+    }
+
+    //city_based
+    if (data.city_based) {
+      if (data.city_based.length < 2) {
+        parsedData.error = 'city_based: min length is 2 characters'
+      } else if (data.city_based.length > 70) {
+        parsedData.error = 'city_based: max length is 70 characters'
+      } else {
+        parsedData.city_based = data.city_based
+      }
+    }
+    
+    // driver
+    if (data.driver) {
+      let driver = ''
+      driver += data.driver.a ? 1 : 0
+      driver += data.driver.b ? 1 : 0
+      driver += data.driver.c ? 1 : 0
+      driver += data.driver.d ? 1 : 0
+      parsedData.driver = driver
+    }
+
+    // car
+    if ([true, false, null].includes(data.car)) {
+      parsedData.car = data.car
+    }
+    
+    //birth
+    if (data.birth) {
+      let d = new Date(data.birth)
+      if (!(d instanceof Date && !isNaN(d))) {
+        parsedData.error = 'birth: invalid date'
+      } else {
+        parsedData.birth = data.birth
+      }
+    }
+    
+    // sex
+    if (data.sex) {
+      if (!['f', 'm'].includes(data.sex)) {
+        parsedData.error = 'sex: wrong gender'
+      } else {
+        parsedData.sex = data.sex
+      }
+    }
+    
+    // family
+    if ([true, false, null].includes(data.family)) {
+      parsedData.family = data.family
+    }
+
+    // exp
+    if ([true, false, null].includes(data.exp)) {
+      parsedData.exp = data.exp
+    }
+
+    //edu
+    if (data.edu) {
+      if (data.edu.length > 30) {
+        parsedData.error = 'edu: max length is 30 characters'
+      } else {
+        parsedData.edu = data.edu
+      }
+    }
+
+    //langs
+    if (data.langs && Array.isArray(data.langs)) {
+      let langsFiltered = data.langs.filter(lang => lang.length < 51)
+      parsedData.langs = langsFiltered
+    } else {
+      parsedData.langs = data.langs
+    }
+
+    //skills
+    if (data.skills) {
+      if (data.skills.length > 500) {
+        parsedData.error = 'skills: max length is 500 characters'
+      } else {
+        parsedData.skills = data.skills
+      }
+    }
+
+    // wanted_job
+    if (!data.wanted_job) {
+      parsedData.error = 'wanted_job is required'
+    } else if (data.wanted_job.length < 2) {
+      parsedData.error = 'wanted_job: min length is 2 characters'
+    } else if (data.wanted_job.length > 75) {
+      parsedData.error = 'wanted_job: max length is 75 characters'
+    } else {
+      parsedData.wanted_job = data.wanted_job
+    }
+
+    //salary_min
+    if (data.salary_min &&
+        isNaN(data.salary_min) === false &&
+        data.salary_min > -1 &&
+        Number.isInteger(Number(data.salary_min))
+    ) {
+      if (String(data.salary_min).length > 5) data.salary_min = String(data.salary_min).substring(0,5)
+      parsedData.salary_min = Number(data.salary_min)
+    } else parsedData.salary_min = null
+
+    //salary_max
+    if (data.salary_max &&
+        isNaN(data.salary_max) === false &&
+        data.salary_max > -1 &&
+        Number.isInteger(Number(data.salary_max))
+    ) {
+      if (String(data.salary_max).length > 5) data.salary_max = String(data.salary_max).substring(0,5)
+      parsedData.salary_max = Number(data.salary_max)
+    } else parsedData.salary_max = null
+
+    //salary order check
+    if (parsedData.salary_max < parsedData.salary_min) {
+      const tmp = parsedData.salary_max
+      parsedData.salary_max = parsedData.salary_min
+      parsedData.salary_min = tmp
+    }
+
+    return parsedData
+  } catch (error) {
+    return { error: 'validation failed: some field had an unpredicted error' + error }
+  }
 }
 
 async function updateOneCompany(req, res) {
@@ -5213,7 +5752,7 @@ async function login(req, res) {
     //get hash from db checking if mail exists
     let que = `
       SELECT pwhash, user_id, role, name, surname, 
-      insearch, company, isagency, cvurl, is_active, 
+      insearch, company, isagency, cvurl, is_active, cv_id, rights, 
       block_reason FROM "users" WHERE "email" = $1`
     let params = [mail]
     let userData = await pool.query(que, params).catch(error => {
@@ -5225,7 +5764,6 @@ async function login(req, res) {
       userData = userData.rows[0]
       userData.identity = mail
     }
-    
     if (userData) {
       //check if blockd
       if (userData.is_active == false) {
@@ -5290,7 +5828,7 @@ async function login(req, res) {
 
 async function getUserAuthByCookies(session, mail) {
   let que = `SELECT email AS identity, user_id, role, 
-    name, surname, company, insearch, isagency, cvurl, is_active
+    name, surname, company, insearch, isagency, cvurl, is_active, cv_id, rights
     FROM "users" 
     WHERE ("auth_cookie" = $1 AND "email" = $2)`
   let params = [session, mail]
@@ -5451,6 +5989,13 @@ module.exports = {
 
   getResps,
   viewHit,
+
+  cvCreateUpdate,
+  cvDelete,
+  cvFetchForEdit,
+  // cvFetchForEditSSR,
+  cvGetIndex,
+  cvGetDetail,
 
   //SSR
   getJobsUserStatsSSR,
