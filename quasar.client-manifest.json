@@ -4,18 +4,18 @@
     "fonts/flUhRq6tzZclQEJ-Vdg-IuiaDsNa.88e9c0a1.woff",
     "fonts/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.b8c10426.woff2",
     "js/10.7be6ad24.js",
-    "js/11.64f5576c.js",
+    "js/11.e3d4ac90.js",
     "js/12.732dc966.js",
     "js/13.4f86fd78.js",
     "js/3.9d6f231d.js",
     "js/4.1299966f.js",
     "js/5.cd60e2c9.js",
-    "js/6.4bced5bc.js",
+    "js/6.9b0143fd.js",
     "js/7.6695839a.js",
     "js/8.fe3bc591.js",
     "js/9.a9ff087d.js",
-    "js/app.c377c895.js",
-    "js/runtime.1b9e051f.js",
+    "js/app.647ba8b2.js",
+    "js/runtime.855a6ea5.js",
     "js/vendor.706b40e2.js",
     "statics/app-logo-128x128.png",
     "statics/bg1-mobile.png",
@@ -25,11 +25,10 @@
     "statics/companyph.png",
     "statics/eye1.png",
     "statics/filter-burger.png",
-    "statics/icons/favicon-16x16.png",
-    "statics/icons/favicon-192x192.png",
-    "statics/icons/favicon-32x32.png",
-    "statics/icons/favicon-62x62.png",
-    "statics/icons/favicon.ico",
+    "statics/icons/Group 74.ico",
+    "statics/icons/favicon-1.svg",
+    "statics/icons/favicon-2.svg",
+    "statics/icons/favicon.svg",
     "statics/login.png",
     "statics/logo1 - Copy.png",
     "statics/logo1.png",
@@ -41,19 +40,19 @@
     "statics/vacOld.xlsx"
   ],
   "initial": [
-    "js/runtime.1b9e051f.js",
+    "js/runtime.855a6ea5.js",
     "js/vendor.706b40e2.js",
-    "js/app.c377c895.js"
+    "js/app.647ba8b2.js"
   ],
   "async": [
     "js/10.7be6ad24.js",
-    "js/11.64f5576c.js",
+    "js/11.e3d4ac90.js",
     "js/12.732dc966.js",
     "js/13.4f86fd78.js",
     "js/3.9d6f231d.js",
     "js/4.1299966f.js",
     "js/5.cd60e2c9.js",
-    "js/6.4bced5bc.js",
+    "js/6.9b0143fd.js",
     "js/7.6695839a.js",
     "js/8.fe3bc591.js",
     "js/9.a9ff087d.js"
@@ -168,9 +167,6 @@
       0,
       1
     ],
-    "7daa1f3c": [
-      9
-    ],
     "b9525fd6": [
       15,
       0,
@@ -227,6 +223,9 @@
       0,
       1
     ],
+    "1c50773b": [
+      3
+    ],
     "8d05227c": [
       15,
       0,
@@ -274,6 +273,9 @@
     ],
     "9093afcc": [
       12
+    ],
+    "e634e684": [
+      13
     ],
     "0f28831c": [
       15,
@@ -372,9 +374,6 @@
       0,
       1
     ],
-    "b71738c0": [
-      3
-    ],
     "2bca285b": [
       15,
       0,
@@ -399,6 +398,9 @@
       15,
       0,
       1
+    ],
+    "77df935c": [
+      13
     ],
     "052b1653": [
       15,
@@ -465,9 +467,6 @@
       15,
       0,
       1
-    ],
-    "c0317ee2": [
-      9
     ],
     "22b8baac": [
       10
@@ -551,9 +550,6 @@
       15,
       0,
       1
-    ],
-    "4360335a": [
-      9
     ],
     "87e65c4e": [
       15,
@@ -804,6 +800,9 @@
       15,
       0,
       1
+    ],
+    "d792e6e0": [
+      3
     ],
     "25da32a8": [
       15,
@@ -1216,6 +1215,9 @@
       0,
       1
     ],
+    "1b3516ed": [
+      9
+    ],
     "4170cf2b": [
       15,
       0,
@@ -1225,9 +1227,6 @@
       15,
       0,
       1
-    ],
-    "f7b91a7c": [
-      3
     ],
     "334c6c27": [
       15,
@@ -1292,6 +1291,9 @@
       15,
       0,
       1
+    ],
+    "557f02cf": [
+      9
     ],
     "4f098747": [
       15,
@@ -1404,6 +1406,9 @@
       0,
       1
     ],
+    "77bc2422": [
+      9
+    ],
     "d9b81e9c": [
       15,
       0,
@@ -1434,6 +1439,9 @@
       15,
       0,
       1
+    ],
+    "efd93b5e": [
+      13
     ],
     "206751d9": [
       13
@@ -1653,9 +1661,6 @@
     "56862b63": [
       13
     ],
-    "0c3d5d6d": [
-      3
-    ],
     "59d5380c": [
       15,
       0,
@@ -1789,6 +1794,9 @@
       15,
       0,
       1
+    ],
+    "96f10524": [
+      3
     ],
     "f4da9c26": [
       15,
