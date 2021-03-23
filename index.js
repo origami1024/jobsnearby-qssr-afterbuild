@@ -4320,23 +4320,29 @@ async function cvGetIndex(req, res) {
         res.send('step3-2: ' + results.rows.length)
         return false
       }
-      const que2 = `SELECT * FROM "cvs" LIMIT 100`
+
+      let page = 1
+      const perpage = 25
+      if (req.query.page && Number(req.query.page) > 0 && Number(req.query.page) < 11) page = Number(req.query.page)
+      const offset = (page - 1) * Number(perpage)
+
+      const que2 = `SELECT * FROM "cvs" LIMIT ${perpage}${offset ? ' OFFSET ' + offset : ''}`
       pool.query(que2, null, (err2, res2) => {
         if (err2) {
           res.send('step4. Error', err2)
           return false
         }
-        // const que3 = `SELECT COUNT(*) FROM "cvs"`
-        // pool.query(que3, null, (err3, res3) => {
-        //   if (err3) {
-        //     res.send('step5. Error')
-        //     return false
-        //   }
+        const que3 = `SELECT COUNT(*) FROM "cvs"`
+        pool.query(que3, null, (err3, res3) => {
+          if (err3) {
+            res.send('step5. Error')
+            return false
+          }
           
-        //   res.status(200).json({...results2.rows[0], 'page': page, 'perpage': perpage, rows: results.rows})
+          res.status(200).json({...res3.rows[0], page, perpage, rows: res2.rows})
         
-        // })
-        res.send(res2.rows)
+        })
+        // res.send(res2.rows)
       })
     })
   } else {res.send('auth fail')}
