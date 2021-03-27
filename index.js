@@ -3193,6 +3193,22 @@ module.exports.extendApp = function ({ app, ssr }) {
     }
     next()
   })
+  app.get('/cv-search', async function (req, res, next) {
+    if (db.authPreValidation(req.signedCookies.session, req.signedCookies.mail)) {
+      req.userData = await db.getUserAuthByCookies(req.signedCookies.session, req.signedCookies.mail).catch(error => {
+        console.log('getUserAuthByCookies. addCV', error)
+        return 'error1'
+      })
+      // req.cvData = await db.cvFetchForEditSSR(req, res).catch(error => {
+      //   console.log('cvFetchForEdit. addCV', error)
+      //   return 'error2'
+      // })
+    } else {
+      //empty or not valid auth data
+      req.userData = 'noauth'
+    }
+    next()
+  })
   app.get('/cv-editor', async function (req, res, next) {
     //only auth here
     if (db.authPreValidation(req.signedCookies.session, req.signedCookies.mail)) {
@@ -4443,7 +4459,6 @@ async function cvFetchForEdit(req, res) {
               edus: results4.rows
             }
 
-            // console.log('cp 1220', results2.rows[0])
             res.send(results2.rows[0])
 
           })
@@ -4721,8 +4736,8 @@ async function cvCreateUpdate (req, res) {
                 Number(cv_id),
                 exp.place,
                 exp.position,
-                (exp.range && exp.range.from) ? exp.range.from : null,
-                (exp.range && exp.range.to) ? exp.range.to : null,
+                exp.start,
+                exp.end,
                 exp.desc
               ]), [])
               
@@ -4799,6 +4814,8 @@ function validateCVExts (data) {
           (!exp.range || (!exp.range.from || exp.range.from.length < 30) || (!exp.range.to || exp.range.to.length < 30)) &&
           (!exp.desc || exp.desc.length < 801)
         ) {
+          exp.start = new Date(exp.range.from)
+          exp.end = new Date(exp.range.to)
           parsedExts.exps.push(exp)
         }
       })
@@ -4816,7 +4833,6 @@ function validateCVExts (data) {
         }
       })
     }
-
     return parsedExts
   } catch (error) {
     return { error: 'validation failed: some field had an unpredicted error' + error }
@@ -4930,8 +4946,10 @@ function validateCV (data) {
       if (!(d instanceof Date && !isNaN(d))) {
         parsedData.error = 'birth: invalid date'
       } else {
-        parsedData.birth = data.birth
+        parsedData.birth = d
       }
+    } else {
+      parsedData.birth = null
     }
     
     // sex
