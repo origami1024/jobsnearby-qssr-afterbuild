@@ -4320,6 +4320,7 @@ async function cvGetDetail(req, res) {
 }
 
 async function cvGetIndex(req, res) {
+  // console.log('cp7', req.query)
   if (authPreValidation(req.signedCookies.session, req.signedCookies.mail)) {
     const que1st = `SELECT user_id, email FROM "users" WHERE auth_cookie = $1 AND email = $2 AND role = 'company' AND rights = 'bauss'`
     const params1st = [req.signedCookies.session, req.signedCookies.mail]
@@ -4337,19 +4338,162 @@ async function cvGetIndex(req, res) {
         return false
       }
 
+      let approvedFilters = {
+        'txt': null,
+        'position': null,
+        'expname': null,
+        'car': null,
+        'city_current': null,
+        'city_based': null,
+        'edu': null,
+        'tel': null,
+        'sal_min': null,
+        'sal_max': null
+      }
+      let likeFilters = [
+        'txt',
+        'position',
+        'expname',
+        'city_current',
+        'city_based',
+        'edu',
+        'tel'
+      ]
+      //LIKE %% filter or exact equals
+      Object.keys(approvedFilters).forEach(key => {
+        if (req.query[key]) {
+          const val = likeFilters.includes(key)
+            ? '%' + String(req.query[key]).toLowerCase() + '%'
+            : String(req.query[key].toLowerCase())
+          approvedFilters[key] = val
+        }
+      })
+
+      // txt first
+      let filters = ''
+      let filtersArray = []
+      let fParams = []
+      let currentParamNum = 1
+      if (approvedFilters.txt) {
+        filtersArray.push(`(LOWER(cvs.wanted_job) LIKE $${currentParamNum} OR
+        LOWER(cvs.skills) LIKE $${currentParamNum} OR
+        LOWER(cv_exps.position) LIKE $${currentParamNum} OR
+        LOWER(cv_edus.spec) LIKE $${currentParamNum} OR
+        LOWER(cv_edus.fac) LIKE $${currentParamNum})`)
+        fParams.push(approvedFilters.txt)
+        currentParamNum += 1
+        // AND
+        //         (LOWER(jobs.title) LIKE $2 OR
+        //         LOWER(users.company) LIKE $2 OR
+        //         LOWER(jobs.description) LIKE $2 OR
+        //         LOWER(jobs.city) LIKE $2)` : ''}
+        //         txt = '%' + req.query.txt.toLowerCase() + '%'
+      }
+      if (approvedFilters.position) {
+        filtersArray.push(`(LOWER(cv_exps.position) LIKE $${currentParamNum})`)
+        fParams.push(approvedFilters.position)
+        currentParamNum += 1
+      }
+
+      if (approvedFilters.expname) {
+        filtersArray.push(`(LOWER(cvs.wanted_job) LIKE $${currentParamNum})`)
+        fParams.push(approvedFilters.expname)
+        currentParamNum += 1
+      }
+      
+      if (approvedFilters.car) {
+        filtersArray.push(`(cvs.car = $${currentParamNum})`)
+        fParams.push(approvedFilters.car)
+        currentParamNum += 1
+      }
+
+      if (approvedFilters.city_current) {
+        filtersArray.push(`(LOWER(cvs.city_current) LIKE $${currentParamNum})`)
+        fParams.push(approvedFilters.city_current)
+        currentParamNum += 1
+      }
+
+      if (approvedFilters.city_based) {
+        filtersArray.push(`(LOWER(cvs.city_based) LIKE $${currentParamNum})`)
+        fParams.push(approvedFilters.city_based)
+        currentParamNum += 1
+      }
+
+      if (approvedFilters.edu) {
+        filtersArray.push(`(LOWER(cvs.edu) LIKE $${currentParamNum} OR
+        LOWER(cv_edus.general) LIKE $${currentParamNum})`)
+        fParams.push(approvedFilters.edu)
+        currentParamNum += 1
+      }
+
+      if (approvedFilters.tel) {
+        filtersArray.push(`(LOWER(cvs.tel) LIKE $${currentParamNum} OR
+        LOWER(cvs.tel_home) LIKE $${currentParamNum})`)
+        fParams.push(approvedFilters.tel)
+        currentParamNum += 1
+      }
+
+      // if (approvedFilters.sal_min) {
+      // // 1. IF NOT NUMBER PROBLEM
+      // // 2. intervals problem
+      //   filtersArray.push(`(cvs.sal_mincvs.sal_min >= $${currentParamNum} AND
+      //     cvs.sal_max >= $${currentParamNum})`)
+      //   fParams.push(approvedFilters.tel)
+      //   currentParamNum += 1
+      // }
+      
+      if (filtersArray.length) {
+        filters = 'WHERE ' + filtersArray.join(' AND ')
+      }
+
+      // console.log('cp filters packed:', filters)
+      // console.log('cp filters parms:', fParams)
+
+
       let page = 1
       const perpage = 25
       if (req.query.page && Number(req.query.page) > 0 && Number(req.query.page) < 11) page = Number(req.query.page)
       const offset = (page - 1) * Number(perpage)
 
-      const que2 = `SELECT * FROM "cvs" LIMIT ${perpage}${offset ? ' OFFSET ' + offset : ''}`
-      pool.query(que2, null, (err2, res2) => {
+      const que2 = `SELECT cvs.* FROM "cvs"
+        LEFT OUTER JOIN cv_exps ON (cvs.id = cv_exps.cv_id)
+        LEFT OUTER JOIN cv_edus ON (cvs.id = cv_edus.cv_id)
+        ${filters || ''}
+        GROUP BY cvs.id
+        LIMIT ${perpage}
+        ${offset ? ' OFFSET ' + offset : ''}`
+      // const que2 = `SELECT cvs.*, cv_exps.*, cv_edus.* FROM "cvs" LEFT OUTER JOIN cv_exps ON (cvs.id = cv_exps.cv_id) LEFT OUTER JOIN cv_edus ON (cvs.id = cv_edus.cv_id)  ${filters || ''} LIMIT ${perpage}${offset ? ' OFFSET ' + offset : ''}`
+      // const que2 = `SELECT * FROM "cvs" LIMIT ${perpage}${offset ? ' OFFSET ' + offset : ''}`
+      // console.log('cp 9090', que2)
+      const params2 = filters.length ? fParams : null
+      pool.query(que2, params2, (err2, res2) => {
         if (err2) {
-          res.send('step4. Error', err2)
+          res.send('step4. Error' + err2)
           return false
         }
-        const que3 = `SELECT COUNT(*) FROM "cvs"`
-        pool.query(que3, null, (err3, res3) => {
+        // that is all shiet cause then pagination is cooked
+        // let cvs = []
+        // console.log('cp rr', res2.rows.length)
+        // res2.rows.forEach(row => {
+        //   // just remove duplicates, no need for the related data on index
+        //   // just need it in search
+        //   const needle = cvs.findIndex(cv => cv.id === row.id)
+        //   if (needle === -1) {
+        //     cvs.push(row)
+        //   }
+        // })
+        // // res2.rows.forEach(row => {
+        // //   const needle = cvs.findIndex(cv => cv.id === row.id)
+        // //   if (needle > -1) {
+        // //     cvs[needle].exps.push({place: row.place, position: row.position, start: row.start, end: row.end, desc: row.desc})
+        // //   }
+        // //   cvs.push(row)
+        // // })
+        const que3 = `SELECT COUNT(DISTINCT cvs.id) FROM "cvs"
+        LEFT OUTER JOIN cv_exps ON (cvs.id = cv_exps.cv_id)
+        LEFT OUTER JOIN cv_edus ON (cvs.id = cv_edus.cv_id)
+        ${filters || ''}`
+        pool.query(que3, params2, (err3, res3) => {
           if (err3) {
             res.send('step5. Error')
             return false
