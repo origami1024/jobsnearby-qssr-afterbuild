@@ -4375,11 +4375,9 @@ async function cvGetIndex(req, res) {
       let fParams = []
       let currentParamNum = 1
       if (approvedFilters.txt) {
-        filtersArray.push(`(LOWER(cvs.wanted_job) LIKE $${currentParamNum} OR
-        LOWER(cvs.skills) LIKE $${currentParamNum} OR
-        LOWER(cv_exps.position) LIKE $${currentParamNum} OR
-        LOWER(cv_edus.spec) LIKE $${currentParamNum} OR
-        LOWER(cv_edus.fac) LIKE $${currentParamNum})`)
+        filtersArray.push(`(LOWER(cvs.name) LIKE $${currentParamNum} OR
+        LOWER(cvs.surname) LIKE $${currentParamNum} OR
+        LOWER(cvs.email) LIKE $${currentParamNum})`)
         fParams.push(approvedFilters.txt)
         currentParamNum += 1
         // AND
