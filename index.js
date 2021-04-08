@@ -4453,11 +4453,13 @@ async function cvGetIndex(req, res) {
       if (req.query.page && Number(req.query.page) > 0 && Number(req.query.page) < 11) page = Number(req.query.page)
       const offset = (page - 1) * Number(perpage)
 
-      const que2 = `SELECT cvs.* FROM "cvs"
+      const que2 = `SELECT cvs.*, users.last_logged_in FROM "cvs"
         LEFT OUTER JOIN cv_exps ON (cvs.id = cv_exps.cv_id)
         LEFT OUTER JOIN cv_edus ON (cvs.id = cv_edus.cv_id)
+        LEFT OUTER JOIN users ON (cvs.id = users.cv_id)
         ${filters || ''}
-        GROUP BY cvs.id
+        GROUP BY cvs.id, users.last_logged_in
+        ORDER BY users.last_logged_in DESC
         LIMIT ${perpage}
         ${offset ? ' OFFSET ' + offset : ''}`
       // const que2 = `SELECT cvs.*, cv_exps.*, cv_edus.* FROM "cvs" LEFT OUTER JOIN cv_exps ON (cvs.id = cv_exps.cv_id) LEFT OUTER JOIN cv_edus ON (cvs.id = cv_edus.cv_id)  ${filters || ''} LIMIT ${perpage}${offset ? ' OFFSET ' + offset : ''}`
