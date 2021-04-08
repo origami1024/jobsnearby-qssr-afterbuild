@@ -4263,7 +4263,7 @@ async function cvGetDetail(req, res) {
         return false
       }
 
-      const que2 = `SELECT * FROM "cvs" WHERE id = $1`
+      const que2 = `SELECT cvs.*, users.last_logged_in FROM "cvs", "users" WHERE users.cv_id = cvs.id AND cvs.id = $1`
       const params2 = [ id ]
       pool.query(que2, params2, (err2, results2) => {
         if (err2) {
@@ -4804,6 +4804,7 @@ async function cvCreateUpdate (req, res) {
         return false
       }
       // parsedData.user_id = uid
+      parsedData.updated_at = new Date()
       let que2
       const columns = Object.keys(parsedData)
       const params2nd = Object.values(parsedData)
