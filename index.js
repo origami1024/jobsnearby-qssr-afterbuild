@@ -4348,7 +4348,10 @@ async function cvGetIndex(req, res) {
         'edu': null,
         'tel': null,
         'sal_min': null,
-        'sal_max': null
+        // 'sal_max': null,
+        'langs': null,
+        'exp_min': null,
+        'exp_max': null
       }
       let likeFilters = [
         'txt',
@@ -4431,14 +4434,35 @@ async function cvGetIndex(req, res) {
         currentParamNum += 1
       }
 
-      // if (approvedFilters.sal_min) {
-      // // 1. IF NOT NUMBER PROBLEM
-      // // 2. intervals problem
-      //   filtersArray.push(`(cvs.sal_mincvs.sal_min >= $${currentParamNum} AND
-      //     cvs.sal_max >= $${currentParamNum})`)
-      //   fParams.push(approvedFilters.tel)
-      //   currentParamNum += 1
-      // }
+      if (approvedFilters.sal_min) {
+      // 1. IF NOT NUMBER PROBLEM
+      // 2. intervals problem
+        filtersArray.push(`(cvs.salary_max >= $${currentParamNum})`)
+        //  OR cvs.salary_max IS NULL
+        fParams.push(approvedFilters.sal_min)
+        currentParamNum += 1
+      }
+      if (approvedFilters.langs && approvedFilters.langs.length < 76) {
+        const langsPrep = '{' + approvedFilters.langs.replace(/[{}]/gi, '') + '}'
+        filtersArray.push(`($${currentParamNum} && cvs.langs::varchar[])`)
+        fParams.push(langsPrep)
+        currentParamNum += 1
+      }
+
+      if (approvedFilters.exp_min && !isNaN(Number(approvedFilters.exp_min))) {
+        const expMinNum = Number(approvedFilters.exp_min)
+        filtersArray.push(`(cvs.total_exp >= $${currentParamNum})`)
+        fParams.push(expMinNum)
+        currentParamNum += 1
+      }
+
+      if (approvedFilters.exp_max && !isNaN(Number(approvedFilters.exp_max))) {
+        const expMaxNum = Number(approvedFilters.exp_max)
+        filtersArray.push(`(cvs.total_exp <= $${currentParamNum})`)
+        fParams.push(expMaxNum)
+        currentParamNum += 1
+      }
+
       
       if (filtersArray.length) {
         filters = 'WHERE ' + filtersArray.join(' AND ')
@@ -4462,6 +4486,7 @@ async function cvGetIndex(req, res) {
         ORDER BY users.last_logged_in DESC
         LIMIT ${perpage}
         ${offset ? ' OFFSET ' + offset : ''}`
+
       // const que2 = `SELECT cvs.*, cv_exps.*, cv_edus.* FROM "cvs" LEFT OUTER JOIN cv_exps ON (cvs.id = cv_exps.cv_id) LEFT OUTER JOIN cv_edus ON (cvs.id = cv_edus.cv_id)  ${filters || ''} LIMIT ${perpage}${offset ? ' OFFSET ' + offset : ''}`
       // const que2 = `SELECT * FROM "cvs" LIMIT ${perpage}${offset ? ' OFFSET ' + offset : ''}`
       // console.log('cp 9090', que2)
@@ -4810,6 +4835,12 @@ async function cvCreateUpdate (req, res) {
       let que2
       const columns = Object.keys(parsedData)
       const params2nd = Object.values(parsedData)
+
+      const parsedExts = validateCVExts(req.body.cvExt)
+      columns.push('total_exp')
+      params2nd.push(parsedExts.totalExp || 0)
+      console.log('cpcpc231', parsedExts)
+
       if (cv_id) {
         //cv found, update
         //use uid for smth???,
@@ -4852,7 +4883,7 @@ async function cvCreateUpdate (req, res) {
           res.send({ result: 'OK' })
         }
 
-        const parsedExts = validateCVExts(req.body.cvExt)
+        // const parsedExts = validateCVExts(req.body.cvExt)
         
         if (parsedExts.error) {
           console.log('error parsing cvExts', parsedExts.error)
@@ -4951,12 +4982,13 @@ function validateCVExts (data) {
       exps: [],
       edus: []
     }
+    console.log('cp9', data.exps)
     if (data.exps && Array.isArray(data.exps) && data.exps.length) {
       data.exps.slice(0, 5).forEach(exp => {
         if (exp.place &&
           exp.place.length < 76 && 
           (!exp.position || exp.position.length < 76) &&
-          (!exp.range || (!exp.range.from || exp.range.from.length < 30) || (!exp.range.to || exp.range.to.length < 30)) &&
+          (!exp.range || (!exp.range.from || (exp.range.from && exp.range.from.length < 30)) || (!exp.range.to || (exp.range.to && exp.range.to.length < 30))) &&
           (!exp.desc || exp.desc.length < 801)
         ) {
           exp.start = new Date(exp.range.from)
@@ -4964,6 +4996,10 @@ function validateCVExts (data) {
           parsedExts.exps.push(exp)
         }
       })
+      
+      parsedExts.totalExp = Math.round(parsedExts.exps.slice(0, 5)
+        .reduce((acc, cur) => acc + (cur.end - cur.start), 0) / 1000 / 60 / 60 / 24 / 30 / 12 * 10
+      ) / 10
     }
 
     if (data.edus && Array.isArray(data.edus) && data.edus.length) {
@@ -5130,7 +5166,7 @@ function validateCV (data) {
     //langs
     if (data.langs && Array.isArray(data.langs)) {
       let langsFiltered = data.langs.filter(lang => lang.length < 51)
-      parsedData.langs = langsFiltered
+      parsedData.langs = langsFiltered.map(l => String(l).toLowerCase())
     } else {
       parsedData.langs = data.langs
     }
