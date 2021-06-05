@@ -4836,18 +4836,14 @@ async function cvCreateUpdate (req, res) {
       const columns = Object.keys(parsedData)
       const params2nd = Object.values(parsedData)
 
-      console.log('ayabaaaa', req.body.cvExt)
       const parsedExts = validateCVExts(req.body.cvExt)
       columns.push('total_exp')
       params2nd.push(parsedExts.totalExp || 0)
 
       if (cv_id) {
         //cv found, update
-        //use uid for smth???,
         const columnsToRefs = columns.map((column, cidx) => column + '=$' + (cidx + 1))
-        // console.log('THIS DA ALRDY EXISTSING', columnsToRefs.join(','))
         que2 = `UPDATE "cvs" SET ${columnsToRefs.join(',')} WHERE id=${cv_id}`
-        console.log('YUPDATIONG')
       } else {
         //no cv - create new
         const refs = Object.keys(columns).map(k => '$' + (Number(k)+1)).join(',')
@@ -5000,6 +4996,8 @@ function validateCVExts (data) {
           exp.start = new Date(exp.range.from)
           if (exp.range.to) {
             exp.end = new Date(exp.range.to)
+          } else {
+            exp.end = null
           }
           parsedExts.exps.push(exp)
         }
