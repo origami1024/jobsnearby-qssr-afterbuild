@@ -4836,10 +4836,10 @@ async function cvCreateUpdate (req, res) {
       const columns = Object.keys(parsedData)
       const params2nd = Object.values(parsedData)
 
+      console.log('ayabaaaa', req.body.cvExt)
       const parsedExts = validateCVExts(req.body.cvExt)
       columns.push('total_exp')
       params2nd.push(parsedExts.totalExp || 0)
-      console.log('cpcpc231', parsedExts)
 
       if (cv_id) {
         //cv found, update
@@ -4982,23 +4982,33 @@ function validateCVExts (data) {
       exps: [],
       edus: []
     }
-    console.log('cp9', data.exps)
     if (data.exps && Array.isArray(data.exps) && data.exps.length) {
       data.exps.slice(0, 5).forEach(exp => {
+
+        if (exp.range && !exp.range.from) {
+          exp.range = {
+            from: exp.range
+          }
+        }
         if (exp.place &&
           exp.place.length < 76 && 
           (!exp.position || exp.position.length < 76) &&
           (!exp.range || (!exp.range.from || (exp.range.from && exp.range.from.length < 30)) || (!exp.range.to || (exp.range.to && exp.range.to.length < 30))) &&
           (!exp.desc || exp.desc.length < 801)
         ) {
+          
           exp.start = new Date(exp.range.from)
-          exp.end = new Date(exp.range.to)
+          if (exp.range.to) {
+            exp.end = new Date(exp.range.to)
+          }
           parsedExts.exps.push(exp)
         }
       })
       
       parsedExts.totalExp = Math.round(parsedExts.exps.slice(0, 5)
-        .reduce((acc, cur) => acc + (cur.end - cur.start), 0) / 1000 / 60 / 60 / 24 / 30 / 12 * 10
+        .reduce((acc, cur) => acc + ((
+            cur.end || new Date()
+          ) - cur.start), 0) / 1000 / 60 / 60 / 24 / 30 / 12 * 10
       ) / 10
     }
 
