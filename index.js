@@ -3941,7 +3941,7 @@ async function getResps(req, res) {
       //   WHERE jobs.author_id = $1 AND cvhits.cvjob_id = jobs.job_id AND cvhits.cvuser_id = users.user_id
       // `
       let que2 = `
-        SELECT cvhits.*, jobs.title, users.name, users.surname
+        SELECT cvhits.*, jobs.title, users.name, users.surname, users.cv_id
         FROM cvhits
         INNER JOIN jobs
         ON jobs.author_id = $1
@@ -4258,7 +4258,7 @@ async function cvGetDetail(req, res) {
       const role = results.rows[0].role
       const rights = results.rows[0].rights
       const cv_id = results.rows[0].cv_id
-      if (!(role === 'company' && rights === 'bauss') && !(role === 'subscriber' && cv_id && cv_id == id)) {
+      if (!(role === 'company') && !(role === 'subscriber' && cv_id && cv_id == id)) { // && rights === 'bauss'
         res.send('Step3-3. Authorization problems. ' + role + ' ' + cv_id)
         return false
       }
@@ -5447,11 +5447,11 @@ async function hitjobcv(req, res) {
     res.status(400).send('Неправильный id вакансии.')
     return false
   }
-  if (!req.body.cvurl || req.body.cvurl.length > 85) {
-    //и еще надо проверить cv url  - что начинается с webhost000
-    res.send('Error: CV not loaded')
-    return false
-  }
+  // if (!req.body.cvurl || req.body.cvurl.length > 85) {
+  //   //и еще надо проверить cv url  - что начинается с webhost000
+  //   res.send('Error: CV not loaded')
+  //   return false
+  // }
   if (authPreValidation(req.signedCookies.session, req.signedCookies.mail)) {
     let que = `
       SELECT user_id
@@ -6116,9 +6116,9 @@ async function registerFinish (id, hash, usertype, arg1, arg2) {
   let insert = ''
   if (usertype === 'company' && (arg2 != true && arg2 != 'true')) arg2 = false
   if (usertype === 'subscriber') insert = `, name = $4, surname = $5`
-  else if (usertype === 'company') insert = `, company = $4, isagency = $5`
+  else if (usertype === 'company') insert = `, company = $4, isagency = $5, block_reason = 'not_verified'`
   let que = `UPDATE "users" SET pwhash = $1, role = $3${insert} where user_id = $2 RETURNING email`
-  //console.log(que, '///', arg2)
+  //console.log(que, '///', arg2)block_reason == 'not_verified'
   let params = [hash, id, usertype, arg1, arg2]
   let result = await pool.query(que, params).catch(error => {
     console.log(error)
@@ -6279,7 +6279,7 @@ async function login(req, res) {
     //get hash from db checking if mail exists
     let que = `
       SELECT pwhash, user_id, role, name, surname,
-      insearch, company, isagency, cvurl, is_active, cv_id, rights, logo_url
+      insearch, company, isagency, cvurl, is_active, cv_id, rights, logo_url,
       block_reason FROM "users" WHERE "email" = $1`
     let params = [mail]
     let userData = await pool.query(que, params).catch(error => {
