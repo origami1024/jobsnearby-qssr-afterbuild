@@ -4256,23 +4256,25 @@ async function cvGetDetail(req, res) {
       }
 
       const user_id = results.rows[0].user_id
-
-      const queAllowedCvs = `SELECT users.cv_id from jobs, cvhits, users
-        WHERE jobs.author_id = $1 AND jobs.job_id = cvhits.cvjob_id AND users.user_id = cvhits.cvuser_id
-        GROUP BY users.cv_id`
       
-      const allowedCvsResp = await pool.query(queAllowedCvs, [user_id]).catch(error => {
-        console.log('cp allowedCvsResp err: ', error)
-        return false
-      })
-      if (!allowedCvsResp || !allowedCvsResp.rows || !allowedCvsResp.rows.length) {
-        res.send('step7-1')
-        return false
-      }
-      const allowedCvIds = allowedCvsResp.rows.map(row => row.cv_id)
-      
-
       const role = results.rows[0].role
+      let allowedCvIds = []
+      if (role === 'company') {
+        const queAllowedCvs = `SELECT users.cv_id from jobs, cvhits, users
+          WHERE jobs.author_id = $1 AND jobs.job_id = cvhits.cvjob_id AND users.user_id = cvhits.cvuser_id
+          GROUP BY users.cv_id`
+
+        const allowedCvsResp = await pool.query(queAllowedCvs, [user_id]).catch(error => {
+          console.log('cp allowedCvsResp err: ', error)
+          return false
+        })
+        if (!allowedCvsResp || !allowedCvsResp.rows || !allowedCvsResp.rows.length) {
+          res.send('step7-1')
+          return false
+        }
+        allowedCvIds = allowedCvsResp.rows.map(row => row.cv_id)
+      }
+
       const rights = results.rows[0].rights
       const cv_id = results.rows[0].cv_id
       if (!(role === 'company' && allowedCvIds.includes(String(id))) && !(role === 'subscriber' && cv_id && cv_id == id)) { // && rights === 'bauss'
