@@ -4256,10 +4256,11 @@ async function cvGetDetail(req, res) {
       }
 
       const user_id = results.rows[0].user_id
+      const rights = results.rows[0].rights
       
       const role = results.rows[0].role
       let allowedCvIds = []
-      if (role === 'company') {
+      if (rights !== 'bauss' && role === 'company') {
         const queAllowedCvs = `SELECT users.cv_id from jobs, cvhits, users
           WHERE jobs.author_id = $1 AND jobs.job_id = cvhits.cvjob_id AND users.user_id = cvhits.cvuser_id
           GROUP BY users.cv_id`
@@ -4275,9 +4276,9 @@ async function cvGetDetail(req, res) {
         allowedCvIds = allowedCvsResp.rows.map(row => row.cv_id)
       }
 
-      const rights = results.rows[0].rights
+      
       const cv_id = results.rows[0].cv_id
-      if (!(role === 'company' && allowedCvIds.includes(String(id))) && !(role === 'subscriber' && cv_id && cv_id == id)) { // && rights === 'bauss'
+      if (rights !== 'bauss' && !(role === 'company' && allowedCvIds.includes(String(id))) && !(role === 'subscriber' && cv_id && cv_id == id)) { // && rights === 'bauss'
         res.send('Step3-3. Authorization problems. ' + role + ' ' + cv_id)
         return false
       }
