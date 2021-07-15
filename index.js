@@ -4802,7 +4802,7 @@ async function cvDelete(req, res) {
       const params21 = [null, uid, null]
       const params22 = [cv_id]
       pool.query(que21, params21, (error21, results21) => {
-        addLog('Удаление резюме - подготовка.', 'Айди резюме: ' + cv_id, uid, userEmail)
+        addLog('Удаление резюме ч1.', 'Айди резюме: ' + cv_id, uid, userEmail)
         pool.query(que22, params22, (error22, results22) => {
           if (error22) {
             res.send('Step 6. ' + error22)
