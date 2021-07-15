@@ -4177,7 +4177,7 @@ async function addOneJob (req, res) {
         res.send('step3-1')
         return false
       } else if (results.rows.length != 1) {
-        res.send('step3-2: ' + results.rows.length)
+        res.send('addOneJob. step3-2: ' + results.rows.length + ' ' + results.rows)
         return false
       }
       let uid = results.rows[0].user_id
@@ -4802,13 +4802,14 @@ async function cvDelete(req, res) {
       const params21 = [null, uid, null]
       const params22 = [cv_id]
       pool.query(que21, params21, (error21, results21) => {
-        if (error21) {
-          res.send('Step 5. ' + error21)
-          return false
-        }
+        addLog('Удаление резюме - подготовка.', 'Айди резюме: ' + cv_id, uid, userEmail)
         pool.query(que22, params22, (error22, results22) => {
           if (error22) {
             res.send('Step 6. ' + error22)
+            return false
+          }
+          if (error21) {
+            res.send('Step 5. ' + error21)
             return false
           }
           res.send('OK')
