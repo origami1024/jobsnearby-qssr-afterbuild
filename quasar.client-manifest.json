@@ -14,7 +14,7 @@
     "js/7.3bf9d704.js",
     "js/8.b11f8bb1.js",
     "js/9.f943c26d.js",
-    "js/app.63b6be09.js",
+    "js/app.6503be88.js",
     "js/chunk-common.9618256f.js",
     "js/runtime.4de2e17d.js",
     "js/vendor.710bb53b.js",
@@ -33,6 +33,7 @@
     "statics/login.png",
     "statics/logo1 - Copy.png",
     "statics/logo1.png",
+    "statics/logo2.png",
     "statics/logoph.png",
     "statics/personph.svg",
     "statics/photoph.png",
@@ -45,7 +46,7 @@
   "initial": [
     "js/runtime.4de2e17d.js",
     "js/vendor.710bb53b.js",
-    "js/app.63b6be09.js"
+    "js/app.6503be88.js"
   ],
   "async": [
     "js/10.5280750e.js",
@@ -163,12 +164,6 @@
       16,
       0,
       1
-    ],
-    "623486ea": [
-      13
-    ],
-    "64a5a4d8": [
-      13
     ],
     "16b6549a": [
       16,
@@ -419,6 +414,9 @@
       0,
       1
     ],
+    "291eb00c": [
+      13
+    ],
     "07467cda": [
       14
     ],
@@ -444,9 +442,6 @@
       16,
       0,
       1
-    ],
-    "722dacad": [
-      13
     ],
     "c04249d2": [
       16,
@@ -753,6 +748,9 @@
       16,
       0,
       1
+    ],
+    "6732bfa4": [
+      13
     ],
     "fc48f78e": [
       16,
@@ -1636,6 +1634,9 @@
       16,
       0,
       1
+    ],
+    "8242cf4e": [
+      13
     ],
     "96dd2162": [
       16,

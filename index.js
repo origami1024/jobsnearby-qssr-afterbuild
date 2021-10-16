@@ -3031,6 +3031,7 @@ module.exports.extendApp = function ({ app, ssr }) {
   app.get('/cplogin.json', adm.adminLogin)
   app.post('/cploginep.json', adm.cpLoginEndpoint)
   app.get('/allfb.json', adm.getAllFB)
+  app.get('/banners.json', adm.banners)
   app.get('/adminusers.json', adm.adminUsers)
   app.get('/adminjobs.json', adm.adminJobs)
   app.get('/adminstats.json', adm.adminStatsRoute)
@@ -6676,6 +6677,64 @@ async function adminLogin(req, res) {
   res.send(loginPage)
 }
 
+async function banners (req, res) {
+  if (req.cookies && req.cookies.sessioa && req.cookies.sessioa.length > 50 && req.cookies.user2) {
+    let auth = await adminAuth(req.cookies.user2, req.cookies.sessioa)
+      .catch(error => {
+        //res.send('step2')
+        return undefined
+      })
+    if (auth) {
+      // let mail = req.cookies.user2
+      let body = `
+        <h4>Баннеры</h4>
+        <a href="/cp.json">
+          << Админка
+        </a>
+        <div>
+          <h5>Стационарный</h5>
+          <div
+            style="
+              background: #ccc8;
+              height: 68px;
+              width: 600px;
+              border-radius: 6px;
+              margin-left: 0;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+            "
+          >
+            Посетите нашу группу в вк. Место под рекламу.
+          </div>
+          <input name="banner1" type="file">
+        </div>
+        <div>
+          <h5>Мобильный</h5>
+          <div
+            style="
+              background: #ccc8;
+              height: 62px;
+              width: 280px;
+              margin-bottom: 12px;
+              padding: 12px 26px;
+              border-radius: 6px;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+            "
+          >
+            Посетите нашу группу в вк. Место под рекламу.
+          </div>
+          <input name="banner2" type="file">
+        </div>
+      `
+      let cpPage = pageParts.head + body + pageParts.footer
+      res.send(cpPage)
+    } else res.send(pageParts.noau)
+  } else res.send(pageParts.noau)
+}
+
 async function adminPanel(req, res) {
   //cookie verify structure
   if (req.cookies && req.cookies.sessioa && req.cookies.sessioa.length > 50 && req.cookies.user2) {
@@ -6806,7 +6865,7 @@ async function adminPanel(req, res) {
       logs += '</tbody></table>'
 
       let body = `
-        <h2 style="text-align:center; margin: 0;">Башня управления. ${mail} ${auth.category_rights === '777' ? 'супер-дупер' : ''}</h2>
+        <h4 style="text-align:center; margin: 0;">Башня управления. ${mail} ${auth.category_rights === '777' ? 'супер-админ' : ''}</h4>
         <hr>
         <main style="display:flex; justify-content: space-around;">
           <section>
@@ -6852,6 +6911,11 @@ async function adminPanel(req, res) {
               <li>
                 <a href="/adminstats.json">
                   Числа
+                </a>
+              </li>
+              <li>
+                <a href="/banners.json">
+                  Баннеры
                 </a>
               </li>
               <li>
@@ -8495,6 +8559,8 @@ module.exports = {
   superAdmin,
   u2out,
   adminNew,
+
+  banners,
 
   fbaction,
   closeJobByIdAdmin,
