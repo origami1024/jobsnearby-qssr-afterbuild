@@ -2833,7 +2833,7 @@ const bundle = __webpack_require__(31)
 const clientManifest = __webpack_require__(32)
 
 const settings = {
-  "pwa": false,
+  "pwa": true,
   "manualHydration": false,
   "componentCache": {
     "max": 1000,
