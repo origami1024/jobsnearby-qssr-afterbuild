@@ -3000,6 +3000,7 @@ module.exports.extendApp = function ({ app, ssr }) {
   app.post('/companyUpdate.json', db.updateOneCompany)
 
   app.post('/getresps', db.getResps)
+  app.get('/getresps', db.getResps)
   app.post('/viewhit', db.viewHit)
   
   app.post('/oneJob', db.addOneJob)
@@ -3925,6 +3926,7 @@ async function viewHit(req, res) {
 }
 
 async function getResps(req, res) {
+  console.log('get resps cp 1')
   if (authPreValidation(req.signedCookies.session, req.signedCookies.mail)) {
     //get author_id first, also check role in the process
     let que = `

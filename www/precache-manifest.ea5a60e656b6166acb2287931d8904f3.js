@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "4f84eba92f7cd39c1db3e63be93fd15c",
+    "revision": "258afa35018a7484ba76833b5388e416",
     "url": "/../quasar.client-manifest.json"
   },
   {
@@ -28,8 +28,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/js/13.4f86fd78.js"
   },
   {
-    "revision": "c231016e8469dad9d226",
-    "url": "/js/3.c231016e.js"
+    "revision": "fea0b345d4f3b0e7b4c5",
+    "url": "/js/3.fea0b345.js"
   },
   {
     "revision": "fb62e1aa025cec8810bc",
@@ -40,39 +40,39 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/js/5.b52449a0.js"
   },
   {
-    "revision": "71f5e430e56ba606cf6f",
-    "url": "/js/6.71f5e430.js"
+    "revision": "4b4f317fd2bf5f04b39c",
+    "url": "/js/6.4b4f317f.js"
   },
   {
     "revision": "6695839a5334ebe80570",
     "url": "/js/7.6695839a.js"
   },
   {
-    "revision": "f5e2f25822ff2158c815",
-    "url": "/js/8.f5e2f258.js"
+    "revision": "a5147ca655df8f5ab61c",
+    "url": "/js/8.a5147ca6.js"
   },
   {
     "revision": "3be82ad2504edb63b3d2",
     "url": "/js/9.3be82ad2.js"
   },
   {
-    "revision": "f68039d01af691603f55",
-    "url": "/js/app.34f56f60.js"
+    "revision": "32b89c288cc654173ff5",
+    "url": "/js/app.66543261.js"
   },
   {
-    "revision": "9618256fbf696235c2e1",
-    "url": "/js/chunk-common.9618256f.js"
+    "revision": "990741d77b7570d92461",
+    "url": "/js/chunk-common.990741d7.js"
   },
   {
-    "revision": "882fd4bbe9aeb44b1d76",
-    "url": "/js/vendor.882fd4bb.js"
+    "revision": "b7cedb9efa592567c6c4",
+    "url": "/js/vendor.b7cedb9e.js"
   },
   {
-    "revision": "daf762db2b7f50327a8771a1ef54128d",
+    "revision": "770581d77b05f3365476b716b161c8c4",
     "url": "/manifest.json"
   },
   {
-    "revision": "27cdc9561aac8cbc98e1fb3e96553be8",
+    "revision": "e76b23841f49d7a7301f951583ee1f0d",
     "url": "/offline.html"
   },
   {
@@ -112,59 +112,115 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/statics/icons/Group 74.ico"
   },
   {
-    "revision": "c9920835d2adb9f6ab6a79a27f220a3a",
+    "revision": "87bc7bd177afaf15371a41c0612b679a",
     "url": "/statics/icons/apple-icon-120x120.png"
   },
   {
-    "revision": "9df9e65a1d2c6df3bd9143666b0e8c63",
+    "revision": "912053e2227ae0ef2c1665f92aff4694",
     "url": "/statics/icons/apple-icon-152x152.png"
   },
   {
-    "revision": "4300c6c136c06abcd781aa18644dd7a3",
+    "revision": "cb72cda65259511e089521da3671eeae",
     "url": "/statics/icons/apple-icon-167x167.png"
   },
   {
-    "revision": "88dbf3d9e8269f1298486d103e22a57c",
+    "revision": "a12ae0664a2b979836d8d5ee9d6753bc",
     "url": "/statics/icons/apple-icon-180x180.png"
+  },
+  {
+    "revision": "1090cc3e491a8a3f869a696ec9d46170",
+    "url": "/statics/icons/apple-launch-1125x2436.png"
+  },
+  {
+    "revision": "22fd5873217a86720ae2eb747d3c6b22",
+    "url": "/statics/icons/apple-launch-1242x2208.png"
+  },
+  {
+    "revision": "012ca33d8e20af0e39f94288961384ef",
+    "url": "/statics/icons/apple-launch-1242x2688.png"
+  },
+  {
+    "revision": "8e7bb41a74afbc21fc2ec8988214ac22",
+    "url": "/statics/icons/apple-launch-1536x2048.png"
+  },
+  {
+    "revision": "59fffd473cb46ffc243317619d6599e0",
+    "url": "/statics/icons/apple-launch-1668x2224.png"
+  },
+  {
+    "revision": "0a0048ce476a4c851df52467d9fc8d9d",
+    "url": "/statics/icons/apple-launch-1668x2388.png"
+  },
+  {
+    "revision": "0f423e33f6b24d9a6c55c8cd38b7de9c",
+    "url": "/statics/icons/apple-launch-2048x2732.png"
+  },
+  {
+    "revision": "92114ff578bd64da70dba513fecf586e",
+    "url": "/statics/icons/apple-launch-640x1136.png"
+  },
+  {
+    "revision": "023f245b8d38fb217fd9c0a3dd29a6f3",
+    "url": "/statics/icons/apple-launch-750x1334.png"
+  },
+  {
+    "revision": "67c4893fc785d8ff3131c8968abe6645",
+    "url": "/statics/icons/apple-launch-828x1792.png"
   },
   {
     "revision": "c58217934bca5525cac0e1a1e02054f8",
     "url": "/statics/icons/favicon-1.svg"
   },
   {
+    "revision": "850ca4fedbebbe8b6fab5b049437e467",
+    "url": "/statics/icons/favicon-128x128.png"
+  },
+  {
+    "revision": "6e3d96f3ce5cd6f439b7f048de5e87bf",
+    "url": "/statics/icons/favicon-16x16.png"
+  },
+  {
     "revision": "524db18cd6a3880db592e1d88e17e06f",
     "url": "/statics/icons/favicon-2.svg"
+  },
+  {
+    "revision": "1f6914e1086d8d1f18098bd37b7b20de",
+    "url": "/statics/icons/favicon-32x32.png"
+  },
+  {
+    "revision": "c58ce79f76de150570a087ab14cd1b94",
+    "url": "/statics/icons/favicon-96x96.png"
   },
   {
     "revision": "524db18cd6a3880db592e1d88e17e06f",
     "url": "/statics/icons/favicon.svg"
   },
   {
-    "revision": "1c7cd8d7a8a416158b5c2e709fe737c6",
+    "revision": "c580ed7df94f0ebbb426e2d09f10fc0a",
     "url": "/statics/icons/icon-128x128.png"
   },
   {
-    "revision": "7ec2df9fc47290ca1eed722af69344f1",
+    "revision": "1cb6ae957086f067c81b06690bdcb0ca",
     "url": "/statics/icons/icon-192x192.png"
   },
   {
-    "revision": "ad397737365c7072b8a27d626126c594",
+    "revision": "139023a84b4bcaa4628d4054e015da84",
     "url": "/statics/icons/icon-256x256.png"
   },
   {
-    "revision": "ed0b3cde759d79dfca7401db3a77911a",
+    "revision": "e60a44cf1eedb1626c292b6534492c83",
     "url": "/statics/icons/icon-384x384.png"
   },
   {
-    "revision": "c3540a74c48e5ec6f63d4ceea8456923",
+    "revision": "6cffcee4937788b3388c6a463f112d86",
     "url": "/statics/icons/icon-512x512.png"
   },
   {
-    "revision": "f256ec55be616f32ae486ab7571eb936",
+    "revision": "9c35fc1bbfe31c46f6543ac27e1ded94",
     "url": "/statics/icons/ms-icon-144x144.png"
   },
   {
-    "revision": "de8107bed7f087fb443d8e36855e7467",
+    "revision": "436031dac229247ae696a7b83a787bf9",
     "url": "/statics/icons/safari-pinned-tab.svg"
   },
   {
